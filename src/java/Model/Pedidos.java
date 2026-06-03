@@ -7,14 +7,13 @@ package Model;
 import java.sql.Timestamp;
 import java.util.List;
 
-
-
 /**
  *
  * @author JHOSMER
  */
 public class Pedidos {
-        private int id_pedido;
+
+    private int id_pedido;
     private Persona persona;
     private Direccion direccion;
     private Timestamp fecha;
@@ -91,5 +90,4 @@ public class Pedidos {
         this.detallepedido = detallepedido;
     }
 
-    
 }

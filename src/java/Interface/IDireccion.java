@@ -4,18 +4,17 @@
  */
 package Interface;
 
-import Model.Persona;
-import Model.Usuario;
+import Model.Direccion;
 import java.util.List;
 
 /**
  *
  * @author JHOSMER
  */
-public interface IPersona {
-    public List<Persona> listar();
-    public int insertar(Persona p, Usuario u);
-    public boolean actualizar (Persona p);
-    public Persona buscarPorid (int id);
-    public boolean eliminar (int id);
+public interface IDireccion {
+
+    public List<Direccion> listar();
+    public boolean insertar(Direccion d);
+    public Direccion buscarPorId(int id);
+    public boolean eliminar(int id);
 }

@@ -4,10 +4,9 @@
  */
 package Dao;
 
-import Interface.IPersona;
-import Model.Persona;
-import Model.Rol;
-import Model.Usuario;
+import Interface.IProducto;
+import Model.Categoria;
+import Model.Producto;
 import Util.ConexionSingleton;
 import java.util.List;
 import java.sql.*;
@@ -17,35 +16,37 @@ import java.util.ArrayList;
  *
  * @author JHOSMER
  */
-public class PersonaDaoImpl implements IPersona {
+public class ProductoDaoImpl implements IProducto {
 
     private Connection cn;
 
     @Override
-    public List<Persona> listar() {
-        List<Persona> lista = null;
-        Persona p;
+    public List<Producto> listar() {
+          List<Producto> lista = null;
+        Producto pr;
         PreparedStatement st;
         ResultSet rs;
         String query = null;
 
         try {
-            query = "SELECT ID_PERSONA, NOMBRE, APELL_PATERNO, APELL_MATERNO, TELEFONO, CORREO"
-                    + " FROM PERSONA";
+            query = "SELECT ID_PRODUCTO, ID_CATEGORIA, NOMBRE, DESCRIPCION, PRECIO FROM PRODUCTO";
             lista = new ArrayList<>();
             cn = ConexionSingleton.getConnection();
             st = cn.prepareStatement(query);
             rs = st.executeQuery();
 
             while (rs.next()) {
-                p = new Persona();
-                p.setId_persona(rs.getInt("ID_PERSONA"));
-                p.setNombre(rs.getString("NOMBRE"));
-                p.setApell_paterno(rs.getString("APELL_PATERNO"));
-                p.setApell_materno(rs.getString("APELL_MATERNO"));
-                p.setTelefono(rs.getString("TELEFONO"));
-                p.setCorreo(rs.getString("CORREO"));
-                lista.add(p);
+                pr = new Producto();
+                pr.setId_producto(rs.getInt("ID_PRODUCTO"));
+
+                Categoria cat = new Categoria();
+                cat.setId_categoria(rs.getInt("ID_CATEGORIA"));
+                pr.setCategoria(cat);
+
+                pr.setNombre(rs.getString("NOMBRE"));
+                pr.setDescripcion(rs.getString("DESCRIPCION"));
+                pr.setPrecio(rs.getDouble("PRECIO"));
+                lista.add(pr);
             }
 
         } catch (Exception e) {
@@ -55,7 +56,7 @@ public class PersonaDaoImpl implements IPersona {
             } catch (Exception ex) {
                 System.out.println("Error en rollback: " + ex.getMessage());
             }
-            System.out.println("No se pudo listar las personas");
+            System.out.println("No se pudo listar el producto");
         } finally {
             if (cn != null) {
                 try {
@@ -63,88 +64,62 @@ public class PersonaDaoImpl implements IPersona {
                 }
             }
         }
-
         return lista;
-
     }
 
     @Override
-    public int insertar(Persona p, Usuario u) {
+    public boolean insertar(Producto p) {
+             boolean flag = false;
         PreparedStatement st;
         String query = null;
-        ResultSet rs;
-        int id_persona = 0;
-        int r = 0;
 
         try {
-            query = "INSERT INTO PERSONA(NOMBRE, APELL_PATERNO, APELL_MATERNO, TELEFONO, CORREO)"
-                    + " VALUES(?, ?, ?, ?, ?)";
+            query = "INSERT INTO PRODUCTO(ID_CATEGORIA, NOMBRE, DESCRIPCION, PRECIO)"
+                  + " VALUES(?, ?, ?, ?)";
             cn = ConexionSingleton.getConnection();
-            st = cn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-            st.setString(1, p.getNombre());
-            st.setString(2, p.getApell_paterno());
-            st.setString(3, p.getApell_materno());
-            st.setString(4, p.getTelefono());
-            st.setString(5, p.getCorreo());
-            r = st.executeUpdate();
-
-            if (r != 0) {
-                rs = st.getGeneratedKeys();
-                if (rs.next()) {
-                    //linea que devuelve el id de la persona creada
-                    id_persona = rs.getInt(1);
-                    System.out.println("id_persona:" + id_persona);
-                }
-                if (id_persona > 0) {
-                    u.setRol(Rol.ADMIN);
-                    String hashpassword = u.HasPassword(u.getContaseña());
-                    query = "INSERT INTO USUARIO (USUARIO,CONTRASENA,ROL,ID_PERSONA) VALUES(?, ?, ?, ?)";
-                    st = cn.prepareStatement(query);
-                    st.setString(1, p.getCorreo());
-                    st.setString(2, hashpassword);
-                    st.setString(3, u.getRol().name());
-                    st.setInt(4, id_persona);
-                    r = st.executeUpdate();
-                } else {
-                    System.out.println("Error al agregar una persona");
-                }
-            }
+            st = cn.prepareStatement(query);
+            st.setInt(1, p.getCategoria().getId_categoria()); 
+            st.setString(2, p.getNombre());
+            st.setString(3, p.getDescripcion());
+            st.setDouble(4, p.getPrecio());
+            st.executeUpdate();
+            flag = true;
 
         } catch (Exception e) {
-            System.out.println("Error al agregar" + e.getMessage());
+            System.out.println("Error al agregar un producto: " + e.getMessage());
             try {
                 cn.rollback();
             } catch (Exception ex) {
-                System.out.println("Error del rollback" + e.getMessage());
+                System.out.println("Error en rollback: " + ex.getMessage());
             }
+            flag = false;
         } finally {
             if (cn != null) {
                 try {
-                } catch (Exception ex) {
+                } catch (Exception e) {
+                    System.out.println("Error al cerrar la conexion: " + e.getMessage());
                 }
             }
         }
-        return r;
+        return flag;
     }
 
     @Override
-    public boolean actualizar(Persona p) {
-        boolean flag = false;
+    public boolean actualizar(Producto p) {
+                boolean flag = false;
         PreparedStatement st;
         String query = null;
 
         try {
-            query = "UPDATE PERSONA SET NOMBRE = ?, APELL_PATERNO = ?, "
-                    + "APELL_MATERNO = ?, TELEFONO = ?, CORREO = ? "
-                    + "WHERE ID_PERSONA = ?";
+            query = "UPDATE PRODUCTO SET ID_CATEGORIA = ?, NOMBRE = ?, DESCRIPCION = ?, PRECIO = ? "
+                  + "WHERE ID_PRODUCTO = ?";
             cn = ConexionSingleton.getConnection();
             st = cn.prepareStatement(query);
-            st.setString(1, p.getNombre());
-            st.setString(2, p.getApell_paterno());
-            st.setString(3, p.getApell_materno());
-            st.setString(4, p.getTelefono());
-            st.setString(5, p.getCorreo());
-            st.setInt(6, p.getId_persona());
+            st.setInt(1, p.getCategoria().getId_categoria()); 
+            st.setString(2, p.getNombre());
+            st.setString(3, p.getDescripcion());
+            st.setDouble(4, p.getPrecio());
+            st.setInt(5, p.getId_producto());                 
             st.executeUpdate();
             flag = true;
 
@@ -169,27 +144,28 @@ public class PersonaDaoImpl implements IPersona {
     }
 
     @Override
-    public Persona buscarPorid(int id) {
-        Persona p = null;
+    public Producto buscarPorId(int id) {
+        Producto prod = null;
         PreparedStatement st;
         ResultSet rs;
         String query = null;
 
         try {
-            query = "SELECT * FROM PERSONA WHERE ID_PERSONA = ?";
+            query = "SELECT * FROM PRODUCTO WHERE ID_PRODUCTO = ?";
             cn = ConexionSingleton.getConnection();
             st = cn.prepareStatement(query);
             st.setInt(1, id);
             rs = st.executeQuery();
 
             if (rs.next()) {
-                p = new Persona();
-                p.setId_persona(rs.getInt("ID_PERSONA"));
-                p.setNombre(rs.getString("NOMBRE"));
-                p.setApell_paterno(rs.getString("APELL_PATERNO"));
-                p.setApell_materno(rs.getString("APELL_MATERNO"));
-                p.setTelefono(rs.getString("TELEFONO"));
-                p.setCorreo(rs.getString("CORREO"));
+                prod = new Producto();
+                prod.setId_producto(rs.getInt("ID_PRODUCTO"));
+                Categoria cat = new Categoria();
+                cat.setId_categoria(rs.getInt("ID_CATEGORIA"));
+                prod.setCategoria(cat);
+                prod.setNombre(rs.getString("NOMBRE"));
+                prod.setDescripcion(rs.getString("DESCRIPCION"));
+                prod.setPrecio(rs.getDouble("PRECIO")); 
             }
 
         } catch (Exception e) {
@@ -199,7 +175,7 @@ public class PersonaDaoImpl implements IPersona {
             } catch (Exception ex) {
                 System.out.println("Error en rollback: " + ex.getMessage());
             }
-            System.out.println("No se pudo buscar la persona por ID");
+            System.out.println("No se pudo buscar por id");
         } finally {
             if (cn != null) {
                 try {
@@ -208,17 +184,17 @@ public class PersonaDaoImpl implements IPersona {
                 }
             }
         }
-        return p;
+        return prod;
     }
 
     @Override
     public boolean eliminar(int id) {
-        boolean flag = false;
+ boolean flag = false;
         PreparedStatement st;
         String query = null;
 
         try {
-            query = "DELETE FROM PERSONA WHERE ID_PERSONA = ?";
+            query = "DELETE FROM PRODUCTO WHERE ID_PRODUCTO = ?";
             cn = ConexionSingleton.getConnection();
             st = cn.prepareStatement(query);
             st.setInt(1, id);
@@ -244,5 +220,4 @@ public class PersonaDaoImpl implements IPersona {
         }
         return flag;
     }
-
 }

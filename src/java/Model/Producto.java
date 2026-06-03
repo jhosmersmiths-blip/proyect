@@ -9,7 +9,9 @@ package Model;
  * @author JHOSMER
  */
 public class Producto {
-        private int id_producto;
+
+    private int id_producto;
+    private Categoria categoria;
     private String nombre;
     private String descripcion;
     private double precio;
@@ -18,8 +20,9 @@ public class Producto {
     public Producto() {
     }
 
-    public Producto(int id_producto, String nombre, String descripcion, double precio, String imagen) {
+    public Producto(int id_producto, Categoria categoria, String nombre, String descripcion, double precio, String imagen) {
         this.id_producto = id_producto;
+        this.categoria = categoria;
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.precio = precio;
@@ -32,6 +35,14 @@ public class Producto {
 
     public void setId_producto(int id_producto) {
         this.id_producto = id_producto;
+    }
+
+    public Categoria getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(Categoria categoria) {
+        this.categoria = categoria;
     }
 
     public String getNombre() {
@@ -65,5 +76,5 @@ public class Producto {
     public void setImagen(String imagen) {
         this.imagen = imagen;
     }
-    
+
 }
