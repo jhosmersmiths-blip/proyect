@@ -42,7 +42,7 @@ public class DireccionDaoImpl implements IDireccion {
                 d.setPersona(p);
                 d.setCiudad(rs.getString("CIUDAD"));
                 d.setCalle(rs.getString("CALLE"));
-                d.setEs_principal(rs.getInt("ES_PRINCIPAL") == 1);
+                d.setEs_principal(rs.getString("ES_PRINCIPAL").equals("S"));
                 lista.add(d);
             }
 
@@ -77,7 +77,7 @@ public class DireccionDaoImpl implements IDireccion {
             st.setInt(1, d.getPersona().getId_persona());
             st.setString(2, d.getCiudad());
             st.setString(3, d.getCalle());
-            st.setInt(4, d.isEs_principal() ? 1 : 0);
+            st.setString(4, d.isEs_principal() ? "S" : "N");
             st.executeUpdate();
             flag = true;
 
@@ -121,7 +121,7 @@ public class DireccionDaoImpl implements IDireccion {
                 d.setPersona(p);
                 d.setCiudad(rs.getString("CIUDAD"));
                 d.setCalle(rs.getString("CALLE"));
-                d.setEs_principal(rs.getInt("ES_PRINCIPAL") == 1);
+                d.setEs_principal(rs.getString("ES_PRINCIPAL").equals("S"));
             }
 
         } catch (Exception e) {

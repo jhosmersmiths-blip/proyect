@@ -13,20 +13,17 @@ public class ConexionSingleton {
         try {
             if (connection == null) {
                 Runtime.getRuntime().addShutdownHook(new getClose());
-                Class.forName("com.mysql.cj.jdbc.Driver");
-                connection = DriverManager.getConnection("jdbc:mysql://localhost/proyect", "root", "jhoss");
-                System.out.println("Entro al if");
                 
 //                    Driver Oracle JDBC
-////                 Class.forName("oracle.jdbc.OracleDriver");
-////                // Conexion Oracle XE
-////                connection = DriverManager.getConnection(
-////                        "jdbc:oracle:thin:@localhost:1521/XE",
-////                        "MODA_ESTILO",
-////                        "123"
-////                );
-////
-////                System.out.println("Conectado a Oracle XE");
+                 Class.forName("oracle.jdbc.OracleDriver");
+                // Conexion Oracle XE
+                connection = DriverManager.getConnection(
+                        "jdbc:oracle:thin:@localhost:1521/XE",
+                        "PROYECTME",
+                        "123"
+                );
+
+                System.out.println("Conectado a Oracle XE");
             }
             return connection;
 

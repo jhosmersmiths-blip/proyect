@@ -20,8 +20,8 @@ public class TestDireccion {
 
     public static void main(String[] args) {
         TestDireccion t = new TestDireccion();
-        t.insertar();
-        //t.listar();
+        //t.insertar();
+        t.listar();
         //t.buscarPorId();
         //t.eliminar();
     }
@@ -29,7 +29,7 @@ public class TestDireccion {
            Direccion d = new Direccion();
            Persona p = new Persona();
            
-        p.setId_persona(3);          
+        p.setId_persona(2);          
         d.setPersona(p);
         d.setCiudad("Lima");
         d.setCalle("Av. Los Pinos 123");

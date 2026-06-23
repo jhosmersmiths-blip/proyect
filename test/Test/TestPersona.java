@@ -20,27 +20,27 @@ public class TestPersona {
 
     public static void main(String[] args) {
         TestPersona t = new TestPersona();
-        //t.insertar();
-        t.valid_user();
+        t.insertar();
+        //t.valid_user();
         //t.listar();
         //t.actualizar();
-        //t.buscarPorid();
+       //t.buscarPorid();
         //t.eliminar();
     }
 
     public void insertar() {
         Persona p = new Persona();
 
-        p.setNombre("jhon");
-        p.setApell_paterno("Saldaña");
-        p.setApell_materno("Sanchez");
-        p.setTelefono("987654321");
-        p.setCorreo("jhonsaldana@gmail.com");
+        p.setNombre("Steeward");
+        p.setApell_paterno("lopez");
+        p.setApell_materno("silva");
+        p.setTelefono("985642312");
+        p.setCorreo("steewardlopez@gmail.com");
 
         Usuario u = new Usuario();
 
-        u.setContaseña("jhon123");
-        u.setRol(Rol.ADMIN);
+        u.setContasena("admin123");
+        u.setRol(Rol.CLIENTE);
         int result = pdao.insertar(p, u);
         if (result > 0) {
             System.out.println("Persona y Usuario creada");
@@ -52,7 +52,7 @@ public class TestPersona {
     }
 
     public void valid_user() {
-        Usuario u = udao.validate("jhosmersmiths@gmail.com", "admin123");
+        Usuario u = udao.validate("steewardlopez@gmail.com", "admin123");
         if (u != null && u.getPersona() != null) {
             System.out.println("Bienvenido" + u.getPersona().getNombre());
             System.out.println("Rol:" + u.getRol());
@@ -96,30 +96,32 @@ public class TestPersona {
             System.out.println("No se pudo actualizar la persona");
         }
     }
-public void buscarPorid() {  
-    Persona p = pdao.buscarPorid(3);
 
-    if (p != null) {
-        System.out.println("Persona encontrada:");
-        System.out.println("ID: " + p.getId_persona());
-        System.out.println("Nombre: " + p.getNombre());
-        System.out.println("Apell_Paterno: " + p.getApell_paterno());
-        System.out.println("Apell_Materno: " + p.getApell_materno());
-        System.out.println("Teléfono: " + p.getTelefono());
-        System.out.println("Correo: " + p.getCorreo());
-    } else {
-        System.out.println("No se encontró ninguna persona con ID: ");
+    public void buscarPorid() {
+        Persona p = pdao.buscarPorid(2);
+
+        if (p != null) {
+            System.out.println("Persona encontrada:");
+            System.out.println("ID: " + p.getId_persona());
+            System.out.println("Nombre: " + p.getNombre());
+            System.out.println("Apell_Paterno: " + p.getApell_paterno());
+            System.out.println("Apell_Materno: " + p.getApell_materno());
+            System.out.println("Teléfono: " + p.getTelefono());
+            System.out.println("Correo: " + p.getCorreo());
+        } else {
+            System.out.println("No se encontró ninguna persona con ID: ");
+        }
     }
-}
-public void eliminar() {
-    Persona p = new Persona();
-    p.setId_persona(4);
-    boolean resultado = pdao.eliminar(4);
-    if (resultado) {
-        System.out.println("Persona eliminada ");
-        System.out.println("ID eliminado: ");
-    } else {
-        System.out.println("No se pudo eliminar la persona con ID: ");
+
+    public void eliminar() {
+        Persona p = new Persona();
+        p.setId_persona(4);
+        boolean resultado = pdao.eliminar(4);
+        if (resultado) {
+            System.out.println("Persona eliminada ");
+            System.out.println("ID eliminado: ");
+        } else {
+            System.out.println("No se pudo eliminar la persona con ID: ");
+        }
     }
-}
 }

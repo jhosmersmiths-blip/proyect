@@ -42,7 +42,7 @@ public class InventarioDaoImpl implements IInventario {
                 i.setProducto(p);
                 i.setTalla(rs.getString("TALLA"));
                 i.setColor(rs.getString("COLOR"));
-                i.setStock(rs.getString("STOCK"));
+                i.setStock(rs.getInt("STOCK"));
                 lista.add(i);
             }
 
@@ -77,7 +77,7 @@ public class InventarioDaoImpl implements IInventario {
             st.setInt(1, i.getProducto().getId_producto());
             st.setString(2, i.getTalla());
             st.setString(3, i.getColor());
-            st.setString(4, i.getStock());
+            st.setInt(4, i.getStock());
             st.executeUpdate();
             flag = true;
 
@@ -112,7 +112,7 @@ public class InventarioDaoImpl implements IInventario {
             st.setInt(1, i.getProducto().getId_producto());
             st.setString(2, i.getTalla());
             st.setString(3, i.getColor());
-            st.setString(4, i.getStock());
+            st.setInt(4, i.getStock());
             st.setInt(5, i.getId_inventario());
             st.executeUpdate();
             flag = true;
@@ -158,7 +158,7 @@ public class InventarioDaoImpl implements IInventario {
                 i.setProducto(p);
                 i.setTalla(rs.getString("TALLA"));
                 i.setColor(rs.getString("COLOR"));
-                i.setStock(rs.getString("STOCK"));
+                i.setStock(rs.getInt("STOCK"));
             }
 
         } catch (Exception e) {

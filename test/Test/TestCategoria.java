@@ -24,8 +24,8 @@ public class TestCategoria {
     }
   public void insertar() {
         Categoria  c = new Categoria();
-        c.setNombre("calzados");
-        c.setDescripcion("Zapatillas y Zapatos de vestir");
+        c.setNombre("hombre");
+        c.setDescripcion("Ropa de hombre");
 
         boolean resultado = cdao.insertar(c);
         if (resultado) {

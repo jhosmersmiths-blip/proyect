@@ -21,17 +21,18 @@ public class TestInventario {
     public static void main(String[] args) {
         TestInventario t = new TestInventario();
         t.insertar();
+        //t.listar();
     }
 
     public void insertar() {
         
         Inventario i = new Inventario();
         Producto p = new Producto();
-        p.setId_producto(1);
+        p.setId_producto(22);
         i.setProducto(p);
-        i.setTalla("M");
-        i.setColor("Azul");
-        i.setStock("50");
+        i.setTalla("L");
+        i.setColor("Negro");
+        i.setStock(10);
 
         boolean resultado = dao.insertar(i);
         if (resultado) {
@@ -64,7 +65,7 @@ public class TestInventario {
         i.setProducto(p);
         i.setTalla("L");
         i.setColor("Rojo");
-        i.setStock("30");
+        i.setStock(30);
 
         boolean resultado = dao.actualizar(i);
         if (resultado) {

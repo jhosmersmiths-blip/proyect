@@ -21,40 +21,41 @@ public class PedidoDaoImpl implements IPedido {
 
     @Override
     public int generarPedido(Pedidos pedidos) {
-        int id_pedido = 0;
+      int id_pedido = 0;
         int r = 0;
         PreparedStatement st;
         String query;
         ResultSet rs;
-
+ 
         try {
             cn = ConexionSingleton.getConnection();
             cn.setAutoCommit(false);
-
+ 
             query = "INSERT INTO PEDIDOS(ID_DIRECCION, ID_PERSONA, FECHA, ESTADO, TOTAL)"
                     + " VALUES(?, ?, ?, ?, ?)";
-            st = cn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            st = cn.prepareStatement(query, new String[]{"ID_PEDIDO"});
             st.setInt(1, pedidos.getDireccion().getId_direccion());
             st.setInt(2, pedidos.getPersona().getId_persona());
             st.setTimestamp(3, pedidos.getFecha());
             st.setString(4, EstadoPedido.PENDIENTE.name());
             st.setDouble(5, pedidos.getTotal());
-            
+ 
             r = st.executeUpdate();
-
+ 
             if (r != 0) {
                 rs = st.getGeneratedKeys();
                 if (rs.next()) {
                     id_pedido = rs.getInt(1);
                 }
-                System.out.println("Pedido generado con ID: " );
+                System.out.println("Pedido generado con ID: " + id_pedido);
             }
-
+ 
             if (id_pedido > 0 && pedidos.getDetallepedido() != null) {
-                query = "INSERT INTO DETALLE_PEDIDO(ID_PEDIDOS, ID_PRODUCTO, ID_INVENTARIO, CANTIDAD, PRECIO_UNITARIO, SUBTOTAL) "
+                query = "INSERT INTO DETALLE_PEDIDO(ID_PEDIDO, ID_PRODUCTO, ID_INVENTARIO, "
+                        + "CANTIDAD, PRECIO_UNITARIO, SUBTOTAL) "
                         + "VALUES(?, ?, ?, ?, ?, ?)";
                 st = cn.prepareStatement(query);
-
+ 
                 for (DetallePedido detalle : pedidos.getDetallepedido()) {
                     st.setInt(1, id_pedido);
                     st.setInt(2, detalle.getProducto().getId_producto());
@@ -65,14 +66,14 @@ public class PedidoDaoImpl implements IPedido {
                     st.addBatch();
                 }
                 st.executeBatch();
-                System.out.println("Pedido y detalles guardados .");
+                System.out.println("Pedido y detalles guardados.");
             } else {
                 System.out.println("Error: no se pudo obtener el ID del pedido.");
                 r = 0;
             }
-
+ 
             cn.commit();
-
+ 
         } catch (Exception e) {
             System.out.println("Error al generar pedido: " + e.getMessage());
             try {
@@ -86,7 +87,7 @@ public class PedidoDaoImpl implements IPedido {
                 try {
                     cn.setAutoCommit(true);
                 } catch (Exception e) {
-                    System.out.println("Error al restaurar : " + e.getMessage());
+                    System.out.println("Error al restaurar autocommit: " + e.getMessage());
                 }
             }
         }

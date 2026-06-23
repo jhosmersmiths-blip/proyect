@@ -17,6 +17,7 @@ import java.util.ArrayList;
  *
  * @author JHOSMER
  */
+
 public class PersonaDaoImpl implements IPersona {
 
     private Connection cn;
@@ -25,8 +26,8 @@ public class PersonaDaoImpl implements IPersona {
     public List<Persona> listar() {
         List<Persona> lista = null;
         Persona p;
-        PreparedStatement st;
-        ResultSet rs;
+        PreparedStatement st = null;
+        ResultSet rs = null;
         String query = null;
 
         try {
@@ -50,17 +51,17 @@ public class PersonaDaoImpl implements IPersona {
 
         } catch (Exception e) {
             System.out.println("Error al listar: " + e.getMessage());
-            try {
-                cn.rollback();
-            } catch (Exception ex) {
-                System.out.println("Error en rollback: " + ex.getMessage());
-            }
             System.out.println("No se pudo listar las personas");
         } finally {
-            if (cn != null) {
-                try {
-                } catch (Exception e) {
+            try {
+                if (rs != null) {
+                    rs.close();
                 }
+                if (st != null) {
+                    st.close();
+                }
+            } catch (Exception e) {
+                System.out.println("Error al cerrar recursos: " + e.getMessage());
             }
         }
 
@@ -70,35 +71,37 @@ public class PersonaDaoImpl implements IPersona {
 
     @Override
     public int insertar(Persona p, Usuario u) {
-        PreparedStatement st;
-        String query = null;
-        ResultSet rs;
-        int id_persona = 0;
-        int r = 0;
 
-        try {
-            query = "INSERT INTO PERSONA(NOMBRE, APELL_PATERNO, APELL_MATERNO, TELEFONO, CORREO)"
-                    + " VALUES(?, ?, ?, ?, ?)";
-            cn = ConexionSingleton.getConnection();
-            st = cn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-            st.setString(1, p.getNombre());
-            st.setString(2, p.getApell_paterno());
-            st.setString(3, p.getApell_materno());
-            st.setString(4, p.getTelefono());
-            st.setString(5, p.getCorreo());
-            r = st.executeUpdate();
+            PreparedStatement st;
+            CallableStatement cs;
+            String query = null;
+            ResultSet rs;
+            int id_persona = 0;
+            int r = 0;
 
-            if (r != 0) {
-                rs = st.getGeneratedKeys();
-                if (rs.next()) {
-                    //linea que devuelve el id de la persona creada
-                    id_persona = rs.getInt(1);
-                    System.out.println("id_persona:" + id_persona);
-                }
+            try {
+                query = "BEGIN INSERT INTO PERSONA(NOMBRE, APELL_PATERNO, APELL_MATERNO, TELEFONO, CORREO)"
+                        + " VALUES(?, ?, ?, ?, ?) RETURNING ID_PERSONA INTO ?; END;";
+                cn = ConexionSingleton.getConnection();
+                cs = cn.prepareCall(query);
+                cs.setString(1, p.getNombre());
+                cs.setString(2, p.getApell_paterno());
+                cs.setString(3, p.getApell_materno());
+                cs.setString(4, p.getTelefono());
+                cs.setString(5, p.getCorreo());
+                cs.registerOutParameter(6, java.sql.Types.INTEGER);
+
+                cs.executeUpdate();
+
+                //linea que devuelve el id de la persona creada
+                id_persona = cs.getInt(6);
+                System.out.println("id_persona:" + id_persona);
+
                 if (id_persona > 0) {
-                    u.setRol(Rol.ADMIN);
-                    String hashpassword = u.HasPassword(u.getContaseña());
-                    query = "INSERT INTO USUARIO (USUARIO,CONTRASENA,ROL,ID_PERSONA) VALUES(?, ?, ?, ?)";
+                    u.setRol(Rol.CLIENTE);
+                    String hashpassword = u.HasPassword(u.getContasena());
+                    query = "INSERT INTO USUARIO (USUARIO,CONTRASENA,ROL,ID_PERSONA)"
+                            + " VALUES(?, ?, ?, ?)";
                     st = cn.prepareStatement(query);
                     st.setString(1, p.getCorreo());
                     st.setString(2, hashpassword);
@@ -108,29 +111,29 @@ public class PersonaDaoImpl implements IPersona {
                 } else {
                     System.out.println("Error al agregar una persona");
                 }
-            }
-
-        } catch (Exception e) {
-            System.out.println("Error al agregar" + e.getMessage());
-            try {
-                cn.rollback();
-            } catch (Exception ex) {
-                System.out.println("Error del rollback" + e.getMessage());
-            }
-        } finally {
-            if (cn != null) {
+            } catch (Exception e) {
+                System.out.println("Error al agregar" + e.getMessage());
                 try {
+                    cn.rollback();
                 } catch (Exception ex) {
+                    System.out.println("Error del rollback" + e.getMessage());
+                }
+            } finally {
+                if (cn != null) {
+                    try {
+                        cn.setAutoCommit(true);
+                    } catch (Exception ex) {
+                    }
                 }
             }
+            return r;
         }
-        return r;
-    }
+
 
     @Override
     public boolean actualizar(Persona p) {
         boolean flag = false;
-        PreparedStatement st;
+        PreparedStatement st = null;
         String query = null;
 
         try {
@@ -151,18 +154,20 @@ public class PersonaDaoImpl implements IPersona {
         } catch (Exception e) {
             System.out.println("Error de actualizacion: " + e.getMessage());
             try {
-                cn.rollback();
+                if (cn != null) {
+                    cn.rollback();
+                }
             } catch (Exception ex) {
                 System.out.println("Error en rollback: " + ex.getMessage());
             }
             flag = false;
         } finally {
-            if (cn != null) {
-                try {
-                    cn.close();
-                } catch (Exception e) {
-                    System.out.println("Error al cerrar la conexion: " + e.getMessage());
+            try {
+                if (st != null) {
+                    st.close();
                 }
+            } catch (Exception e) {
+                System.out.println("Error al cerrar recursos: " + e.getMessage());
             }
         }
         return flag;
@@ -171,8 +176,8 @@ public class PersonaDaoImpl implements IPersona {
     @Override
     public Persona buscarPorid(int id) {
         Persona p = null;
-        PreparedStatement st;
-        ResultSet rs;
+        PreparedStatement st = null;
+        ResultSet rs = null;
         String query = null;
 
         try {
@@ -194,18 +199,17 @@ public class PersonaDaoImpl implements IPersona {
 
         } catch (Exception e) {
             System.out.println("Error de busqueda: " + e.getMessage());
-            try {
-                cn.rollback();
-            } catch (Exception ex) {
-                System.out.println("Error en rollback: " + ex.getMessage());
-            }
             System.out.println("No se pudo buscar la persona por ID");
         } finally {
-            if (cn != null) {
-                try {
-                } catch (Exception e) {
-                    System.out.println("Error al cerrar la conexion: " + e.getMessage());
+            try {
+                if (rs != null) {
+                    rs.close();
                 }
+                if (st != null) {
+                    st.close();
+                }
+            } catch (Exception e) {
+                System.out.println("Error al cerrar recursos: " + e.getMessage());
             }
         }
         return p;
@@ -214,7 +218,7 @@ public class PersonaDaoImpl implements IPersona {
     @Override
     public boolean eliminar(int id) {
         boolean flag = false;
-        PreparedStatement st;
+        PreparedStatement st = null;
         String query = null;
 
         try {
@@ -228,18 +232,21 @@ public class PersonaDaoImpl implements IPersona {
         } catch (Exception e) {
             System.out.println("Error al eliminar: " + e.getMessage());
             try {
-                cn.rollback();
+                if (cn != null) {
+                    cn.rollback();
+                }
             } catch (Exception ex) {
                 System.out.println("Error en rollback: " + ex.getMessage());
             }
             flag = false;
-            System.out.println("Error, no se eliminó el registro");
+            System.out.println("Error, no se elimino el registro");
         } finally {
-            if (cn != null) {
-                try {
-                } catch (Exception e) {
-                    System.out.println("Error al cerrar la conexion: " + e.getMessage());
+            try {
+                if (st != null) {
+                    st.close();
                 }
+            } catch (Exception e) {
+                System.out.println("Error al cerrar recursos: " + e.getMessage());
             }
         }
         return flag;

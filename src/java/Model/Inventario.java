@@ -13,12 +13,12 @@ public class Inventario {
     private Producto producto;
     private String talla;
     private String color;
-    private String stock;
+    private int stock;
 
     public Inventario() {
     }
 
-    public Inventario(int id_inventario, Producto producto, String talla, String color, String stock) {
+    public Inventario(int id_inventario, Producto producto, String talla, String color, int stock) {
         this.id_inventario = id_inventario;
         this.producto = producto;
         this.talla = talla;
@@ -58,12 +58,13 @@ public class Inventario {
         this.color = color;
     }
 
-    public String getStock() {
+    public int getStock() {
         return stock;
     }
 
-    public void setStock(String stock) {
+    public void setStock(int stock) {
         this.stock = stock;
     }
+
     
 }

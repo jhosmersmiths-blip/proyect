@@ -22,14 +22,14 @@ public class ProductoDaoImpl implements IProducto {
 
     @Override
     public List<Producto> listar() {
-          List<Producto> lista = null;
+        List<Producto> lista = null;
         Producto pr;
         PreparedStatement st;
         ResultSet rs;
         String query = null;
 
         try {
-            query = "SELECT ID_PRODUCTO, ID_CATEGORIA, NOMBRE, DESCRIPCION, PRECIO FROM PRODUCTO";
+            query = "SELECT ID_PRODUCTO, ID_CATEGORIA, NOMBRE, DESCRIPCION, PRECIO, IMAGEN FROM PRODUCTO";
             lista = new ArrayList<>();
             cn = ConexionSingleton.getConnection();
             st = cn.prepareStatement(query);
@@ -46,6 +46,7 @@ public class ProductoDaoImpl implements IProducto {
                 pr.setNombre(rs.getString("NOMBRE"));
                 pr.setDescripcion(rs.getString("DESCRIPCION"));
                 pr.setPrecio(rs.getDouble("PRECIO"));
+                pr.setImagen(rs.getString("IMAGEN"));
                 lista.add(pr);
             }
 
@@ -69,19 +70,20 @@ public class ProductoDaoImpl implements IProducto {
 
     @Override
     public boolean insertar(Producto p) {
-             boolean flag = false;
+        boolean flag = false;
         PreparedStatement st;
         String query = null;
 
         try {
-            query = "INSERT INTO PRODUCTO(ID_CATEGORIA, NOMBRE, DESCRIPCION, PRECIO)"
-                  + " VALUES(?, ?, ?, ?)";
+            query = "INSERT INTO PRODUCTO(ID_CATEGORIA, NOMBRE, DESCRIPCION, PRECIO, IMAGEN)"
+                    + " VALUES(?, ?, ?, ?, ?)";
             cn = ConexionSingleton.getConnection();
             st = cn.prepareStatement(query);
-            st.setInt(1, p.getCategoria().getId_categoria()); 
+            st.setInt(1, p.getCategoria().getId_categoria());
             st.setString(2, p.getNombre());
             st.setString(3, p.getDescripcion());
             st.setDouble(4, p.getPrecio());
+            st.setString(5, p.getImagen());
             st.executeUpdate();
             flag = true;
 
@@ -106,20 +108,20 @@ public class ProductoDaoImpl implements IProducto {
 
     @Override
     public boolean actualizar(Producto p) {
-                boolean flag = false;
+        boolean flag = false;
         PreparedStatement st;
         String query = null;
 
         try {
             query = "UPDATE PRODUCTO SET ID_CATEGORIA = ?, NOMBRE = ?, DESCRIPCION = ?, PRECIO = ? "
-                  + "WHERE ID_PRODUCTO = ?";
+                    + "WHERE ID_PRODUCTO = ?";
             cn = ConexionSingleton.getConnection();
             st = cn.prepareStatement(query);
-            st.setInt(1, p.getCategoria().getId_categoria()); 
+            st.setInt(1, p.getCategoria().getId_categoria());
             st.setString(2, p.getNombre());
             st.setString(3, p.getDescripcion());
             st.setDouble(4, p.getPrecio());
-            st.setInt(5, p.getId_producto());                 
+            st.setInt(5, p.getId_producto());
             st.executeUpdate();
             flag = true;
 
@@ -165,7 +167,9 @@ public class ProductoDaoImpl implements IProducto {
                 prod.setCategoria(cat);
                 prod.setNombre(rs.getString("NOMBRE"));
                 prod.setDescripcion(rs.getString("DESCRIPCION"));
-                prod.setPrecio(rs.getDouble("PRECIO")); 
+                prod.setPrecio(rs.getDouble("PRECIO"));
+                prod.setImagen(rs.getString("IMAGEN"));
+                
             }
 
         } catch (Exception e) {
@@ -189,7 +193,7 @@ public class ProductoDaoImpl implements IProducto {
 
     @Override
     public boolean eliminar(int id) {
- boolean flag = false;
+        boolean flag = false;
         PreparedStatement st;
         String query = null;
 

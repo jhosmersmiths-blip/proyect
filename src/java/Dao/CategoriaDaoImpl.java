@@ -24,16 +24,17 @@ public class CategoriaDaoImpl implements ICategoria {
         boolean flag = false;
         PreparedStatement st;
         String query = null;
-
+ 
         try {
-            query = "INSERT INTO CATEGORIA(NOMBRE, DESCRIPCION) VALUES(?, ?)";
+            query = "INSERT INTO CATEGORIA(NOMBRE, DESCRIPCION)"
+                    + " VALUES(?, ?)";
             cn = ConexionSingleton.getConnection();
             st = cn.prepareStatement(query);
             st.setString(1, c.getNombre());
             st.setString(2, c.getDescripcion());
             st.executeUpdate();
             flag = true;
-
+ 
         } catch (Exception e) {
             System.out.println("Error al insertar categoria: " + e.getMessage());
             try {

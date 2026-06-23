@@ -22,8 +22,8 @@ public class TestDetallePedido {
 
     public static void main(String[] args) {
         TestDetallePedido t = new TestDetallePedido();
-        t.insertar();
-        //t.listar();
+        //t.insertar();
+        t.listar();
         //t.actualizar();
         //t.buscarPorId();
         //t.eliminar();

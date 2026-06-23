@@ -74,7 +74,7 @@ public class AuthController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
@@ -110,9 +110,9 @@ public class AuthController extends HttpServlet {
                 p.setNombre(request.getParameter("nombre"));
                 p.setApell_paterno(request.getParameter("Apell_Paterno"));
                 p.setApell_materno(request.getParameter("Apell_Materno"));
-                p.setCorreo(request.getParameter("correo"));
                 p.setTelefono(request.getParameter("telefono"));
-                u.setContaseña(request.getParameter("contrasena"));
+                p.setCorreo(request.getParameter("correo"));
+                u.setContasena(request.getParameter("contrasena"));
 
                 int resultado = pDao.insertar(p, u);
 

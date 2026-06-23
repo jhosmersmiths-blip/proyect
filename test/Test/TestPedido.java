@@ -31,10 +31,10 @@ public class TestPedido {
 
     public void generarPedido() {
         Persona p = new Persona();
-        p.setId_persona(3);
+        p.setId_persona(2);
 
         Direccion dir = new Direccion();
-        dir.setId_direccion(3);
+        dir.setId_direccion(1);
 
         List<DetallePedido> listaDetalles = new ArrayList<>();
 

@@ -20,9 +20,9 @@ public class TestProducto {
 
     public static void main(String[] args) {
         TestProducto t = new TestProducto();
-        //t.insertar();
+        t.insertar();
         //t.listar();
-        t.buscarPorId();
+       //t.buscarPorId();
         //t.actualizar();
         //t.elimnar();
 
@@ -37,6 +37,7 @@ public class TestProducto {
                 System.out.println("Nombre: " + p.getNombre());
                 System.out.println("Descripcion: " + p.getDescripcion());
                 System.out.println("Precio: " + p.getPrecio());
+                System.out.println("imagen: " + p.getImagen());
             }
         } else {
             System.out.println("No hay productos registrados");
@@ -46,12 +47,13 @@ public class TestProducto {
     public static void insertar() {
         Producto p = new Producto();
         Categoria cat = new Categoria();
-        cat.setId_categoria(2);
+        cat.setId_categoria(1);
 
         p.setCategoria(cat);
-        p.setNombre("Camisa");
-        p.setDescripcion("Camisa de vestir");
-        p.setPrecio(55.90);
+        p.setNombre("camisa");
+        p.setDescripcion("camisa de vestir");
+        p.setPrecio(85.90);
+        p.setImagen("camisa.png");
 
         boolean resultado = dao.insertar(p);
         if (resultado) {
@@ -91,6 +93,7 @@ public class TestProducto {
             System.out.println("Nombre: " + p.getNombre());
             System.out.println("Descripcion: " + p.getDescripcion());
             System.out.println("Precio: " + p.getPrecio());
+            System.out.println("Imagen: " + p.getImagen());
         } else {
             System.out.println("No se encontró producto con ID: " + idBuscar);
         }
