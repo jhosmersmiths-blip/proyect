@@ -1,0 +1,123 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-info fixed-top shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="index.html"><i class="bi bi-shop me-2"></i>MODA & ESTILO</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link active" href="index.html">Inicio</a></li>
+            </ul>
+
+            <div class="d-flex align-items-center">
+                <!-- Carrito -->
+                <a href="carrito.html" class="btn btn-outline-light me-3 position-relative">
+                    <i class="bi bi-cart3"></i>
+                    <span id="cart-count" class="badge rounded-pill bg-danger">0</span>
+                </a>
+
+                <!-- Botón Login (Se oculta al entrar) -->
+                <button type="button" id="btn-login-modal" class="btn btn-light text-danger fw-bold" data-bs-toggle="modal" data-bs-target="#modalLogin">
+                    <i class="bi bi-person-circle me-1"></i> Login
+                </button>
+
+                <!-- Perfil Usuario (Se muestra al entrar) -->
+                <!-- Dentro de header.html -->
+                <div id="user-profile" class="dropdown d-none">
+                    <button class="btn btn-light dropdown-toggle text-info fw-bold" type="button" data-bs-toggle="dropdown">
+                        <span id="user-name">Usuario</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                        <!-- OPCIÓN ADMIN -->
+                        <li>
+                            <a class="dropdown-item d-none text-primary fw-bold" href="admin_productos.html" id="link-admin">
+                                <i class="bi bi-kanban me-2"></i>Administrar Productos
+                            </a>
+                        </li>
+                        <li id="separator-admin" class="d-none"><hr class="dropdown-divider"></li>
+
+                        <!-- OPCIONES COMUNES -->
+                        <li><a class="dropdown-item" href="mis_compras.html"><i class="bi bi-bag-check me-2"></i>Mis Compras</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Mi Perfil</a></li>
+                        <li><a class="dropdown-item text-danger" href="#" onclick="logout()">
+                                <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- MODAL LOGIN -->
+<div class="modal fade" id="modalLogin" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title">Iniciar Sesión</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-login">
+                    <div class="mb-3">
+                        <label class="form-label">Correo Electrónico</label>
+                        <input type="email" name="usuario" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Contraseña</label>
+                        <input type="password" name="contrasena" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-info text-white w-100">Entrar</button>
+                </form>
+                <p class="text-center mt-3 small">¿No tienes cuenta? <a href="#" data-bs-toggle="modal" data-bs-target="#modalRegister">Regístrate aquí</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!<!-- modal registro -->
+<div class="modal fade" id="modalRegister" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title">Crear Cuenta</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-register">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre</label>
+                        <input type="text" name="nombre" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Apell Paterno</label>
+                        <input type="text" name="Apell_paterno" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Apell Materno</label>
+                        <input type="text" name="Apell_materno" class="form-control" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Telefono</label>
+                            <input type="text" name="telefono" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Correo</label>
+                            <input type="email" name="correo" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Contraseña</label>
+                            <input type="password" name="contrasena" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Direccion</label>
+                        <textarea name="direccion" class="form-control" rows="2"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-info text-white w-100">Registrarme</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

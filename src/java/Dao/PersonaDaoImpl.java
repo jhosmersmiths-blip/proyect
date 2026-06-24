@@ -17,7 +17,6 @@ import java.util.ArrayList;
  *
  * @author JHOSMER
  */
-
 public class PersonaDaoImpl implements IPersona {
 
     private Connection cn;
@@ -72,63 +71,62 @@ public class PersonaDaoImpl implements IPersona {
     @Override
     public int insertar(Persona p, Usuario u) {
 
-            PreparedStatement st;
-            CallableStatement cs;
-            String query = null;
-            ResultSet rs;
-            int id_persona = 0;
-            int r = 0;
+        PreparedStatement st;
+        String query = null;
+        CallableStatement cs;
+        ResultSet rs;
+        int id_persona = 0;
+        int r = 0;
 
+        try {
+            query = "BEGIN INSERT INTO PERSONA(NOMBRE, APELL_PATERNO, APELL_MATERNO, TELEFONO, CORREO)"
+                    + " VALUES(?, ?, ?, ?, ?) RETURNING ID_PERSONA INTO ?; END;";
+            cn = ConexionSingleton.getConnection();
+            cs = cn.prepareCall(query);
+            cs.setString(1, p.getNombre());
+            cs.setString(2, p.getApell_paterno());
+            cs.setString(3, p.getApell_materno());
+            cs.setString(4, p.getTelefono());
+            cs.setString(5, p.getCorreo());
+            cs.registerOutParameter(6, java.sql.Types.INTEGER);
+
+            cs.executeUpdate();
+
+            //linea que devuelve el id de la persona creada
+            id_persona = cs.getInt(6);
+            System.out.println("id_persona:" + id_persona);
+
+            if (id_persona > 0) {
+                u.setRol(Rol.CLIENTE);
+                String hashpassword = u.HasPassword(u.getContasena());
+                query = "INSERT INTO USUARIO (USUARIO,CONTRASENA,ROL,ID_PERSONA)"
+                        + " VALUES(?, ?, ?, ?)";
+                st = cn.prepareStatement(query);
+                st.setString(1, p.getCorreo());
+                st.setString(2, hashpassword);
+                st.setString(3, u.getRol().name());
+                st.setInt(4, id_persona);
+                r = st.executeUpdate();
+            } else {
+                System.out.println("Error al agregar una persona");
+            }
+        } catch (Exception e) {
+            System.out.println("Error al agregar" + e.getMessage());
             try {
-                query = "BEGIN INSERT INTO PERSONA(NOMBRE, APELL_PATERNO, APELL_MATERNO, TELEFONO, CORREO)"
-                        + " VALUES(?, ?, ?, ?, ?) RETURNING ID_PERSONA INTO ?; END;";
-                cn = ConexionSingleton.getConnection();
-                cs = cn.prepareCall(query);
-                cs.setString(1, p.getNombre());
-                cs.setString(2, p.getApell_paterno());
-                cs.setString(3, p.getApell_materno());
-                cs.setString(4, p.getTelefono());
-                cs.setString(5, p.getCorreo());
-                cs.registerOutParameter(6, java.sql.Types.INTEGER);
-
-                cs.executeUpdate();
-
-                //linea que devuelve el id de la persona creada
-                id_persona = cs.getInt(6);
-                System.out.println("id_persona:" + id_persona);
-
-                if (id_persona > 0) {
-                    u.setRol(Rol.CLIENTE);
-                    String hashpassword = u.HasPassword(u.getContasena());
-                    query = "INSERT INTO USUARIO (USUARIO,CONTRASENA,ROL,ID_PERSONA)"
-                            + " VALUES(?, ?, ?, ?)";
-                    st = cn.prepareStatement(query);
-                    st.setString(1, p.getCorreo());
-                    st.setString(2, hashpassword);
-                    st.setString(3, u.getRol().name());
-                    st.setInt(4, id_persona);
-                    r = st.executeUpdate();
-                } else {
-                    System.out.println("Error al agregar una persona");
-                }
-            } catch (Exception e) {
-                System.out.println("Error al agregar" + e.getMessage());
+                cn.rollback();
+            } catch (Exception ex) {
+                System.out.println("Error del rollback" + e.getMessage());
+            }
+        } finally {
+            if (cn != null) {
                 try {
-                    cn.rollback();
+                    cn.setAutoCommit(true);
                 } catch (Exception ex) {
-                    System.out.println("Error del rollback" + e.getMessage());
-                }
-            } finally {
-                if (cn != null) {
-                    try {
-                        cn.setAutoCommit(true);
-                    } catch (Exception ex) {
-                    }
                 }
             }
-            return r;
         }
-
+        return r;
+    }
 
     @Override
     public boolean actualizar(Persona p) {

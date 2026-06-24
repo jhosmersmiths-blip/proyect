@@ -1,0 +1,33 @@
+<link rel="stylesheet" href="assets/css/bootstrap.min.css">
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+
+<style>
+    /* 1. Ajuste para el Header Fijo */
+    :root {
+        --nav-height: 50px; /* Altura promedio del navbar de Bootstrap */
+    }
+
+    body { 
+        padding-top: var(--nav-height); 
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh; /* Ocupa el 100% de la pantalla */
+        margin: 0;
+    }
+
+    /* 2. El Main se expande para empujar al footer */
+    main {
+        flex: 1 0 auto; 
+    }
+
+    /* 3. Eliminar espacios sobrantes del carrusel */
+    .carousel {
+        margin-top: 0 !important;
+    }
+
+    /* 4. Estilo opcional para el footer */
+    footer {
+        flex-shrink: 0;
+    }
+</style>

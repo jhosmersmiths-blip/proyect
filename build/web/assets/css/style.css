@@ -1,0 +1,49 @@
+.bg-info{
+    background-color:  #c9536a !important;
+}
+.nav-link,.navbar-brand{
+    color:#DA8999 !important;
+}
+.nav-link:hover,.navbar-brand:hover{
+    color:#fff !important;
+}
+.btn-outline-success{
+    border-color: #f8a900 !important;
+    color:#fff !important;
+}
+.btn-outline-success:hover{
+     background-color: #f8a900 !important;
+    color: #003366 !important;
+}
+.card-header{
+    background-color: #003366 !important;
+    color: #fff !important; 
+
+}
+.catalog-header small{
+    letter-spacing: 1px;
+}
+
+.categoria-btn{
+    border-radius: 0;
+    font-size: 12px;
+    padding: 6px 14px;
+}
+
+.categoria-btn.active{
+    background: #c9536a;
+    border-color: #c9536a;
+    color: white;
+}
+
+#buscarProducto{
+    width: 220px;
+}
+.text-danger {
+    color: #dd94a2 !important;
+}
+.carousel-inner{
+    height: 400px;        /* ajusta este valor */
+    object-fit: cover;    /* recorta sin deformar */
+    object-position: top; /* muestra la parte superior */
+}

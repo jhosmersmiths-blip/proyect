@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Carrito — MODA & ESTILO</title>
+    <div id="head-placeholder"></div>
+</head>
+<body>
+    <header id="header-placeholder"></header>
+
+    <main class="container mt-5">
+        <h2 class="fw-bold text-dark mb-4">
+            <i class="bi bi-cart-check me-2 text-danger"></i>Mi carrito de compras
+        </h2>
+
+        <div class="row">
+            <!-- Tabla productos -->
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body p-0">
+                        <table id="tabla-carrito" class="table table-hover align-middle mb-0">
+                            <thead style="background-color:#c9536a; color:white;">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Producto</th>
+                                    <th>Precio</th>
+                                    <th>Cantidad</th>
+                                    <th>Subtotal</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="6" class="text-center py-4 text-muted">
+                                        <div class="spinner-border text-danger" role="status"></div>
+                                        <p class="mt-2">Cargando carrito...</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <a href="index.html" class="btn btn-outline-danger">
+                    <i class="bi bi-arrow-left me-2"></i>Seguir comprando
+                </a>
+            </div>
+
+            <!-- Resumen -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-4">Resumen del pedido</h5>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Subtotal</span>
+                            <span id="resumen-subtotal">S/ 0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Envío</span>
+                            <span class="text-success fw-bold">Gratis</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between mb-4">
+                            <span class="fw-bold fs-5">Total</span>
+                            <span class="fw-bold fs-5 text-danger" id="resumen-total">S/ 0.00</span>
+                        </div>
+                        <button onclick="procesarCompra()" class="btn btn-danger text-white w-100 fw-bold py-2">
+                            <i class="bi bi-bag-check me-2"></i>FINALIZAR COMPRA
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer id="footer-placeholder"></footer>
+    <script src="assets/js/main.js"></script>
+</body>
+</html>
