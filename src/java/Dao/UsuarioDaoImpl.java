@@ -29,12 +29,12 @@ private Connection cn;
             u=new Usuario();
             p = new Persona();
             String hashedPassword = u.HasPassword(contra);
-            query = " select U.ID_USUARIO, U.USUARIO, U.ROL, P.ID_PERSONA,"
-                    + " P.NOMBRE"
-                    + " FROM PERSONA P, USUARIO U"
-                    + " where P.ID_PERSONA = U.ID_PERSONA"
-                    + " AND U.USUARIO = ?"
-                    + " AND U.CONTRASENA = ?";
+            query = "SELECT U.ID_USUARIO, U.USUARIO, U.ROL, P.ID_PERSONA,"
+                  + " P.NOMBRE, P.APELL_PATERNO, P.APELL_MATERNO, P.CORREO, P.TELEFONO"
+                  + " FROM PERSONA P, USUARIO U"
+                  + " WHERE P.ID_PERSONA = U.ID_PERSONA"
+                  + " AND U.USUARIO = ?"
+                  + " AND U.CONTRASENA = ?";
 
             cn = ConexionSingleton.getConnection();
             st = cn.prepareStatement(query);
@@ -46,10 +46,14 @@ private Connection cn;
                 u.setId_usuario(rs.getInt("ID_USUARIO"));
                 u.setUsuario(rs.getString("USUARIO"));
                 u.setRol(Rol.valueOf(rs.getString("ROL").toUpperCase()));
+                p = new Persona();
                 p.setId_persona(rs.getInt("ID_PERSONA"));
                 p.setNombre(rs.getString("NOMBRE"));
+                p.setApell_paterno(rs.getString("APELL_PATERNO"));
+                p.setApell_materno(rs.getString("APELL_MATERNO"));
+                p.setCorreo(rs.getString("CORREO"));
+                p.setTelefono(rs.getString("TELEFONO"));
                 u.setPersona(p);
-
             }
         } catch (Exception e) {
             System.out.println("Error al validar usuario:" + e.getMessage());

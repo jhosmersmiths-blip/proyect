@@ -1,4 +1,4 @@
- /*
+/*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
@@ -60,6 +60,30 @@ public class AuthController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        String action = request.getParameter("action");
+
+        if ("obtenerPerfil".equals(action)) {
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            JsonObject json = new JsonObject();
+            Gson gson = new Gson();
+            try (PrintWriter out = response.getWriter()) {
+                HttpSession session = request.getSession(false);
+                if (session == null || session.getAttribute("usuario") == null) {
+                    json.addProperty("success", false);
+                    json.addProperty("message", "Sesion no activa");
+                } else {
+                    Usuario us = (Usuario) session.getAttribute("usuario");
+                    json.addProperty("success", true);
+                    json.add("persona", gson.toJsonTree(us.getPersona()));
+                    json.addProperty("rol", us.getRol() != null ? us.getRol().toString() : "CLIENTE");
+                }
+                out.print(json.toString());
+            }
+            return;
+        }
+
         processRequest(request, response);
     }
 

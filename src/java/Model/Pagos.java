@@ -16,16 +16,18 @@ public class Pagos {
     private String metodo_pago;
     private EstadoPago estadopago;
     private Timestamp fecha;
+    private String imagen;
 
     public Pagos() {
     }
 
-    public Pagos(int id_pago, Pedidos pedidos, String metodo_pago, EstadoPago estadopago, Timestamp fecha) {
+    public Pagos(int id_pago, Pedidos pedidos, String metodo_pago, EstadoPago estadopago, Timestamp fecha, String imagen) {
         this.id_pago = id_pago;
         this.pedidos = pedidos;
         this.metodo_pago = metodo_pago;
         this.estadopago = estadopago;
         this.fecha = fecha;
+        this.imagen = imagen;
     }
 
     public int getId_pago() {
@@ -67,5 +69,13 @@ public class Pagos {
     public void setFecha(Timestamp fecha) {
         this.fecha = fecha;
     }
-    
+
+    public String getImagen() {
+        return imagen;
+    }
+
+    public void setImagen(String imagen) {
+        this.imagen = imagen;
+    }
+
 }

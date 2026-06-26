@@ -5,6 +5,7 @@
 package Interface;
 
 import Model.Pedidos;
+import java.util.List;
 
 /**
  *
@@ -12,4 +13,6 @@ import Model.Pedidos;
  */
 public interface IPedido {
       public int generarPedido(Pedidos pedidos);
+      public List<Pedidos> listarPorPersona(int idPersona);
+      public Pedidos buscarPorId(int idPedido);
 }

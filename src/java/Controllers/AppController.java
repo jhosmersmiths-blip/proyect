@@ -37,12 +37,12 @@ import java.util.List;
  */
 @WebServlet(name = "AppController", urlPatterns = {"/AppController"})
 public class AppController extends HttpServlet {
-    
+
     private final IProducto pDao = new ProductoDaoImpl();
     private final IInventario iDao = new InventarioDaoImpl();
     private final IPedido peDao = new PedidoDaoImpl();
     private final Gson gson = new Gson();
-    
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -50,13 +50,15 @@ public class AppController extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
 
         String action = request.getParameter("action");
-        if (action == null) action = "listarProductos";
+        if (action == null) {
+            action = "listarProductos";
+        }
 
         JsonObject jr = new JsonObject();
         HttpSession session = request.getSession(true);
 
-        List<DetallePedido> carrito =
-            (List<DetallePedido>) session.getAttribute("carrito");
+        List<DetallePedido> carrito
+                = (List<DetallePedido>) session.getAttribute("carrito");
         if (carrito == null) {
             carrito = new ArrayList<>();
             session.setAttribute("carrito", carrito);
@@ -73,7 +75,7 @@ public class AppController extends HttpServlet {
                 case "listarInventario":
                     try {
                         int idProd = Integer.parseInt(
-                            request.getParameter("id_producto"));
+                                request.getParameter("id_producto"));
                         List<Inventario> todos = iDao.listar();
                         List<Inventario> filtrados = new ArrayList<>();
                         for (Inventario i : todos) {
@@ -92,10 +94,10 @@ public class AppController extends HttpServlet {
                 case "AddCarrito":
                     try {
                         int idInv = Integer.parseInt(
-                            request.getParameter("id_inventario"));
+                                request.getParameter("id_inventario"));
                         String cantParam = request.getParameter("cantidad");
                         int cantidad = (cantParam != null)
-                            ? Integer.parseInt(cantParam) : 1;
+                                ? Integer.parseInt(cantParam) : 1;
 
                         Inventario inv = iDao.buscarPorId(idInv);
                         if (inv == null) {
@@ -106,7 +108,7 @@ public class AppController extends HttpServlet {
                         }
 
                         Producto prod = pDao.buscarPorId(
-                            inv.getProducto().getId_producto());
+                                inv.getProducto().getId_producto());
                         if (prod == null) {
                             jr.addProperty("success", false);
                             jr.addProperty("message", "Producto no encontrado");
@@ -126,13 +128,13 @@ public class AppController extends HttpServlet {
                         }
 
                         int cantActual = (pos != -1)
-                            ? carrito.get(pos).getCantidad() : 0;
-                        int cantFinal  = cantActual + cantidad;
+                                ? carrito.get(pos).getCantidad() : 0;
+                        int cantFinal = cantActual + cantidad;
 
                         if (cantFinal > stockDisp) {
                             jr.addProperty("success", false);
                             jr.addProperty("message",
-                                "Stock insuficiente. Disponible: " + stockDisp);
+                                    "Stock insuficiente. Disponible: " + stockDisp);
                             out.print(jr.toString());
                             break;
                         }
@@ -141,7 +143,7 @@ public class AppController extends HttpServlet {
                             DetallePedido existente = carrito.get(pos);
                             existente.setCantidad(cantFinal);
                             existente.setSubtotal(
-                                cantFinal * existente.getPrecio_unitario());
+                                    cantFinal * existente.getPrecio_unitario());
                         } else {
                             DetallePedido det = new DetallePedido();
 
@@ -179,7 +181,7 @@ public class AppController extends HttpServlet {
 
                 case "listarCarrito":
                     double total = carrito.stream()
-                        .mapToDouble(DetallePedido::getSubtotal).sum();
+                            .mapToDouble(DetallePedido::getSubtotal).sum();
                     session.setAttribute("total", total);
 
                     JsonObject carData = new JsonObject();
@@ -192,18 +194,18 @@ public class AppController extends HttpServlet {
                 case "delete":
                     try {
                         int idElim = Integer.parseInt(
-                            request.getParameter("id_inventario"));
+                                request.getParameter("id_inventario"));
 
                         boolean eliminado = carrito.removeIf(
-                            d -> d.getInventario()
-                                   .getId_inventario() == idElim);
+                                d -> d.getInventario()
+                                        .getId_inventario() == idElim);
 
                         session.setAttribute("carrito", carrito);
 
                         jr.addProperty("success", eliminado);
                         jr.addProperty("message", eliminado
-                            ? "Producto eliminado del carrito"
-                            : "Item no encontrado en el carrito");
+                                ? "Producto eliminado del carrito"
+                                : "Item no encontrado en el carrito");
 
                     } catch (Exception e) {
                         jr.addProperty("success", false);
@@ -211,17 +213,58 @@ public class AppController extends HttpServlet {
                     }
                     out.print(jr.toString());
                     break;
+                    
+                case "listarMisCompras":
+                    Usuario userCompras = (Usuario) session.getAttribute("usuario");
+                    if (userCompras == null || userCompras.getPersona() == null) {
+                        out.print("[]");
+                        break;
+                    }
+                    List<Pedidos> misPedidos = peDao.listarPorPersona(
+                            userCompras.getPersona().getId_persona());
+                    out.print(gson.toJson(misPedidos));
+                    break;
+
+                case "detallePedido":
+                    try {
+                        int idPed = Integer.parseInt(request.getParameter("id_pedido"));
+                        Pedidos pedidoDetalle = peDao.buscarPorId(idPed);
+                        if (pedidoDetalle != null) {
+                            out.print(gson.toJson(pedidoDetalle));
+                        } else {
+                            jr.addProperty("error", "Pedido no encontrado");
+                            out.print(jr.toString());
+                        }
+                    } catch (Exception e) {
+                        jr.addProperty("error", "Error: " + e.getMessage());
+                        out.print(jr.toString());
+                    }
+                    break;
 
                 case "GenerarCompra":
                     Usuario user = (Usuario) session.getAttribute("usuario");
 
-                    if (user == null || user.getPersona() == null) {
+                    int idPersonaParam = 0;
+                    String idPersonaStr = request.getParameter("id_persona");
+                    if (idPersonaStr != null && !idPersonaStr.isEmpty()) {
+                        try {
+                            idPersonaParam = Integer.parseInt(idPersonaStr);
+                        } catch (Exception ex) {
+                        }
+                    }
+
+                    if ((user == null || user.getPersona() == null) && idPersonaParam == 0) {
                         jr.addProperty("success", false);
                         jr.addProperty("message",
-                            "Debe iniciar sesión para continuar");
+                                "Debe iniciar sesión para continuar");
                         out.print(jr.toString());
                         return;
                     }
+
+                    // Usar persona de sesion o del parametro
+                    int idPersona = (user != null && user.getPersona() != null)
+                            ? user.getPersona().getId_persona()
+                            : idPersonaParam;
 
                     if (carrito.isEmpty()) {
                         jr.addProperty("success", false);
@@ -234,50 +277,50 @@ public class AppController extends HttpServlet {
                     if (idDirParam == null || idDirParam.trim().isEmpty()) {
                         jr.addProperty("success", false);
                         jr.addProperty("message",
-                            "Debe seleccionar una dirección de envío");
+                                "Debe seleccionar una dirección de envío");
                         out.print(jr.toString());
                         return;
                     }
 
                     for (DetallePedido det : carrito) {
                         Inventario invCheck = iDao.buscarPorId(
-                            det.getInventario().getId_inventario());
+                                det.getInventario().getId_inventario());
 
                         if (invCheck == null
                                 || invCheck.getStock() < det.getCantidad()) {
                             jr.addProperty("success", false);
                             jr.addProperty("message",
-                                "Stock insuficiente para: "
-                                + det.getProducto().getNombre()
-                                + " | Talla: "
-                                + det.getInventario().getTalla()
-                                + " | Color: "
-                                + det.getInventario().getColor()
-                                + " | Disponible: "
-                                + (invCheck != null
-                                    ? invCheck.getStock() : 0));
+                                    "Stock insuficiente para: "
+                                    + det.getProducto().getNombre()
+                                    + " | Talla: "
+                                    + det.getInventario().getTalla()
+                                    + " | Color: "
+                                    + det.getInventario().getColor()
+                                    + " | Disponible: "
+                                    + (invCheck != null
+                                            ? invCheck.getStock() : 0));
                             out.print(jr.toString());
                             return;
                         }
                     }
 
                     double totalPagar = carrito.stream()
-                        .mapToDouble(DetallePedido::getSubtotal).sum();
+                            .mapToDouble(DetallePedido::getSubtotal).sum();
 
                     Pedidos pedido = new Pedidos();
 
                     Persona persona = new Persona();
                     persona.setId_persona(
-                        user.getPersona().getId_persona());
+                            user.getPersona().getId_persona());
                     pedido.setPersona(persona);
 
                     Direccion direccion = new Direccion();
                     direccion.setId_direccion(
-                        Integer.parseInt(idDirParam));
+                            Integer.parseInt(idDirParam));
                     pedido.setDireccion(direccion);
 
                     pedido.setFecha(
-                        new Timestamp(System.currentTimeMillis()));
+                            new Timestamp(System.currentTimeMillis()));
                     pedido.setTotal(totalPagar);
                     pedido.setDetallepedido(carrito);
 
@@ -286,13 +329,13 @@ public class AppController extends HttpServlet {
                     if (resultado > 0) {
                         for (DetallePedido det : carrito) {
                             Inventario invAct = iDao.buscarPorId(
-                                det.getInventario().getId_inventario());
+                                    det.getInventario().getId_inventario());
                             if (invAct != null) {
-                                int nuevoStock =
-                                    invAct.getStock() - det.getCantidad();
+                                int nuevoStock
+                                        = invAct.getStock() - det.getCantidad();
                                 iDao.actualizarStock(
-                                    det.getInventario().getId_inventario(),
-                                    nuevoStock);
+                                        det.getInventario().getId_inventario(),
+                                        nuevoStock);
                             }
                         }
 
@@ -307,8 +350,8 @@ public class AppController extends HttpServlet {
                     } else {
                         jr.addProperty("success", false);
                         jr.addProperty("message",
-                            "No se pudo procesar la compra. "
-                            + "Intente nuevamente.");
+                                "No se pudo procesar la compra. "
+                                + "Intente nuevamente.");
                     }
                     out.print(jr.toString());
                     break;
@@ -316,7 +359,7 @@ public class AppController extends HttpServlet {
                 default:
                     jr.addProperty("success", false);
                     jr.addProperty("message",
-                        "Acción no reconocida: " + action);
+                            "Acción no reconocida: " + action);
                     out.print(jr.toString());
             }
 
@@ -324,12 +367,10 @@ public class AppController extends HttpServlet {
             JsonObject error = new JsonObject();
             error.addProperty("success", false);
             error.addProperty("message",
-                "Error interno: " + e.getMessage());
+                    "Error interno: " + e.getMessage());
             response.getWriter().print(error.toString());
         }
     }
-
-    
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
