@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <div id="head-placeholder"></div>
+</head>
+<body>
+<header id="header-placeholder"></header>
+
+<main class="container-fluid mt-4 mb-5">
+    <div class="container">
+
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+            <div>
+                <small class="text-danger fw-bold text-uppercase">--- Panel Admin</small>
+                <h2 class="fw-bold text-dark mb-0">Gestión de Productos</h2>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-danger btn-sm" onclick="adminAbrirModalNuevo()">
+                    <i class="bi bi-plus-lg me-1"></i>Nuevo Producto
+                </button>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body d-flex gap-3 flex-wrap align-items-center">
+                <input type="text" id="buscar-prod" class="form-control admin-filtro-text"
+                       placeholder="Buscar producto..." oninput="adminFiltrarProductos()">
+                <select id="filtro-categoria" class="form-select admin-filtro-select" onchange="adminFiltrarProductos()">
+                    <option value="">Todas las categorías</option>
+                </select>
+                <span class="text-muted small ms-auto" id="total-productos"></span>
+            </div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-info text-white">
+                            <tr>
+                                <th class="ps-4">#</th>
+                                <th>Imagen</th>
+                                <th>Nombre</th>
+                                <th>Categoría</th>
+                                <th>Descripción</th>
+                                <th class="text-end">Precio</th>
+                                <th>Inventario</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-productos">
+                            <tr><td colspan="8" class="text-center py-5">
+                                <div class="spinner-border text-danger"></div>
+                                <p class="mt-2 text-muted">Cargando productos...</p>
+                            </td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Modal Producto — rediseñado -->
+<div class="modal fade" id="modalProducto" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content modal-prod-content">
+            <div class="modal-header modal-prod-header text-white px-4 py-3">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-box-seam fs-5"></i>
+                    <h5 class="modal-title mb-0 fw-bold" id="modal-prod-titulo">Nuevo Producto</h5>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body px-4 py-4">
+                <input type="hidden" id="prod-id">
+                <p class="prod-campo-label mb-3"><i class="bi bi-info-circle me-1"></i>Información del producto</p>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-8">
+                        <label class="prod-campo-label d-block mb-1">Nombre <span class="text-danger">*</span></label>
+                        <input type="text" id="prod-nombre" class="form-control prod-campo-input" placeholder="Ej: Camisa Oxford Slim Fit">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="prod-campo-label d-block mb-1">Precio (S/) <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text prod-precio-prefix">S/</span>
+                            <input type="number" id="prod-precio" class="form-control prod-precio-input" step="0.01" min="0" placeholder="0.00">
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <label class="prod-campo-label d-block mb-1">Categoría <span class="text-danger">*</span></label>
+                        <select id="prod-categoria" class="form-select prod-campo-input">
+                            <option value="">— Selecciona una categoría —</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="prod-campo-label d-block mb-1">Descripción</label>
+                        <textarea id="prod-descripcion" class="form-control prod-campo-input" rows="2" placeholder="Breve descripción..."></textarea>
+                    </div>
+                </div>
+                <p class="prod-campo-label mb-3"><i class="bi bi-image me-1"></i>Imagen del producto</p>
+                <div class="d-flex gap-3 align-items-start mb-4">
+                    <div id="preview-container" class="d-none flex-shrink-0">
+                        <img id="preview-img" src="" alt="Preview" class="prod-preview-img">
+                    </div>
+                    <label class="prod-upload-area flex-grow-1" for="prod-imagen">
+                        <input type="file" id="prod-imagen" accept="image/*" class="d-none" onchange="adminPreviewImagen(this)">
+                        <i class="bi bi-cloud-upload text-danger fs-3 d-block mb-1"></i>
+                        <div class="fw-semibold text-dark small">Haz clic para subir imagen</div>
+                        <div class="text-muted small">PNG, JPG, WEBP</div>
+                    </label>
+                </div>
+                <input type="hidden" id="prod-imagen-actual">
+                <div id="seccion-variantes-inline" class="d-none">
+                    <div class="variantes-zona">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <i class="bi bi-tags-fill text-danger"></i>
+                            <span class="variantes-titulo">Tallas y Colores</span>
+                            <span class="text-muted small ms-1">— puedes agregarlas ahora o después</span>
+                        </div>
+                        <div class="row g-2 align-items-end mb-3">
+                            <div class="col">
+                                <label class="prod-campo-label d-block mb-1">Talla</label>
+                                <input type="text" id="new-inv-talla" class="form-control form-control-sm prod-campo-input" placeholder="S, M, L, XL...">
+                            </div>
+                            <div class="col">
+                                <label class="prod-campo-label d-block mb-1">Color</label>
+                                <input type="text" id="new-inv-color" class="form-control form-control-sm prod-campo-input" placeholder="Rojo, Azul...">
+                            </div>
+                            <div class="col-auto">
+                                <label class="prod-campo-label d-block mb-1">Stock</label>
+                                <input type="number" id="new-inv-stock" class="form-control form-control-sm prod-campo-input" placeholder="0" min="0" style="width:75px">
+                            </div>
+                            <div class="col-auto">
+                                <button class="btn btn-danger btn-sm px-3 prod-btn" onclick="adminAgregarVarianteInline()">
+                                    <i class="bi bi-plus-lg me-1"></i>Agregar
+                                </button>
+                            </div>
+                        </div>
+                        <div id="variantes-chips" class="d-flex flex-wrap gap-2">
+                            <span class="text-muted small fst-italic">Sin variantes agregadas aún.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer modal-prod-footer px-4 py-3">
+                <button class="btn btn-outline-secondary px-4 prod-btn" data-bs-dismiss="modal">Cancelar</button>
+                <button class="btn btn-danger fw-bold px-5 prod-btn" onclick="adminGuardarProducto()">
+                    <i class="bi bi-floppy me-2"></i>Guardar Producto
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Inventario -->
+<div class="modal fade" id="modalInventario" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title">Inventario — <span id="inv-prod-nombre"></span></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <input type="hidden" id="inv-id-producto">
+                <div class="card border border-danger mb-4">
+                    <div class="card-header bg-danger text-white fw-bold py-2">
+                        <i class="bi bi-plus-circle me-1"></i>Agregar / Editar variante
+                    </div>
+                    <div class="card-body">
+                        <input type="hidden" id="inv-id-inventario">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold small">Talla</label>
+                                <input type="text" id="inv-talla" class="form-control" placeholder="S, M, L...">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold small">Color</label>
+                                <input type="text" id="inv-color" class="form-control" placeholder="Rojo...">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold small">Stock</label>
+                                <input type="number" id="inv-stock" class="form-control" placeholder="0" min="0">
+                            </div>
+                            <div class="col-md-3 d-flex gap-2">
+                                <button class="btn btn-danger w-100" onclick="adminGuardarInventario()">
+                                    <i class="bi bi-floppy me-1"></i>Guardar
+                                </button>
+                                <button class="btn btn-outline-secondary" onclick="adminLimpiarFormInv()" title="Limpiar">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover align-middle">
+                        <thead class="bg-info text-white">
+                            <tr>
+                                <th>Talla</th><th>Color</th>
+                                <th class="text-center">Stock</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-inventario">
+                            <tr><td colspan="4" class="text-center text-muted py-3">Sin variantes</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer id="footer-placeholder"></footer>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

@@ -19,13 +19,13 @@ public class TestCategoria {
 
     public static void main(String[] args) {
         TestCategoria t = new TestCategoria();
-        //t.insertar();
-        t.listar();
+        t.insertar();
+        //t.listar();
     }
   public void insertar() {
         Categoria  c = new Categoria();
-        c.setNombre("hombre");
-        c.setDescripcion("Ropa de hombre");
+        c.setNombre("calzados");
+        c.setDescripcion("todo tipo de calzados");
 
         boolean resultado = cdao.insertar(c);
         if (resultado) {

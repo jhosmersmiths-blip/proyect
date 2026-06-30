@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <div id="head-placeholder"></div>
+</head>
+<body>
+<header id="header-placeholder"></header>
+
+<main class="container-fluid mt-4 mb-5">
+    <div class="container">
+
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+            <div>
+                <small class="text-danger fw-bold text-uppercase">--- Panel Admin</small>
+                <h2 class="fw-bold text-dark mb-0">Gestión de Pedidos</h2>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm text-center p-3">
+                    <div class="fs-2 fw-bold text-dark" id="s-total">—</div>
+                    <div class="small text-muted">Total pedidos</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm text-center p-3">
+                    <div class="fs-2 fw-bold text-warning" id="s-pendientes">—</div>
+                    <div class="small text-muted">Pendientes</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm text-center p-3">
+                    <div class="fs-2 fw-bold text-info" id="s-enviados">—</div>
+                    <div class="small text-muted">Enviados</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm text-center p-3">
+                    <div class="fs-2 fw-bold text-success" id="s-entregados">—</div>
+                    <div class="small text-muted">Entregados</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body d-flex gap-3 flex-wrap align-items-center">
+                <input type="text" id="buscar-pedido" class="form-control admin-filtro-text"
+                       placeholder="Buscar por cliente o ID..." oninput="adminFiltrarPedidos()">
+                <select id="filtro-estado" class="form-select admin-filtro-select-sm" onchange="adminFiltrarPedidos()">
+                    <option value="">Todos los estados</option>
+                    <option value="PENDIENTE">Pendiente</option>
+                    <option value="ENVIADO">Enviado</option>
+                    <option value="ENTREGADO">Entregado</option>
+                    <option value="CANCELADO">Cancelado</option>
+                </select>
+                <span class="text-muted small ms-auto" id="total-pedidos-label"></span>
+            </div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-info text-white">
+                            <tr>
+                                <th class="ps-4">#</th>
+                                <th>Cliente</th>
+                                <th>Fecha</th>
+                                <th>Dirección</th>
+                                <th class="text-end">Total</th>
+                                <th class="text-center">Estado</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-pedidos">
+                            <tr><td colspan="7" class="text-center py-5">
+                                <div class="spinner-border text-danger"></div>
+                                <p class="mt-2 text-muted">Cargando pedidos...</p>
+                            </td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Modal Detalle -->
+<div class="modal fade" id="modalDetalle" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title fw-bold">
+                    <i class="bi bi-receipt me-2"></i>Detalle del Pedido #<span id="det-id"></span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4" id="modal-det-body">
+                <div class="text-center py-4">
+                    <div class="spinner-border text-danger"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Cambiar Estado -->
+<div class="modal fade" id="modalEstado" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered admin-modal-estado">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title fw-bold">Cambiar Estado</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <input type="hidden" id="estado-id-pedido">
+                <p class="mb-3 text-muted small">Pedido #<span id="estado-num-pedido" class="fw-bold text-dark"></span></p>
+                <label class="form-label fw-bold">Nuevo estado</label>
+                <select id="nuevo-estado" class="form-select">
+                    <option value="PENDIENTE">Pendiente</option>
+                    <option value="ENVIADO">Enviado</option>
+                    <option value="ENTREGADO">Entregado</option>
+                    <option value="CANCELADO">Cancelado</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button class="btn btn-info text-white fw-bold" onclick="adminConfirmarCambioEstado()">
+                    <i class="bi bi-check2 me-1"></i>Actualizar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer id="footer-placeholder"></footer>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

@@ -10,6 +10,7 @@ package Model;
  */
 public enum EstadoPago {
     PAGADO,
-    FALLIDO
+    FALLIDO,
+    REEMBOLSO_PENDIENTE
     
 }

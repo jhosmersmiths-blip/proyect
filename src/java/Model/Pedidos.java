@@ -20,11 +20,12 @@ public class Pedidos {
     private EstadoPedido estado;
     private double total;
     private List<DetallePedido> detallepedido;
+    private String motivo_cancelacion;
 
     public Pedidos() {
     }
 
-    public Pedidos(int id_pedido, Persona persona, Direccion direccion, Timestamp fecha, EstadoPedido estado, double total, List<DetallePedido> detallepedido) {
+    public Pedidos(int id_pedido, Persona persona, Direccion direccion, Timestamp fecha, EstadoPedido estado, double total, List<DetallePedido> detallepedido, String motivo_cancelacion) {
         this.id_pedido = id_pedido;
         this.persona = persona;
         this.direccion = direccion;
@@ -32,6 +33,7 @@ public class Pedidos {
         this.estado = estado;
         this.total = total;
         this.detallepedido = detallepedido;
+        this.motivo_cancelacion = motivo_cancelacion;
     }
 
     public int getId_pedido() {
@@ -89,5 +91,15 @@ public class Pedidos {
     public void setDetallepedido(List<DetallePedido> detallepedido) {
         this.detallepedido = detallepedido;
     }
+
+    public String getMotivo_cancelacion() {
+        return motivo_cancelacion;
+    }
+
+    public void setMotivo_cancelacion(String motivo_cancelacion) {
+        this.motivo_cancelacion = motivo_cancelacion;
+    }
+    
+   
 
 }

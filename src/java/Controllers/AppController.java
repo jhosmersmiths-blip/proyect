@@ -5,14 +5,19 @@
 package Controllers;
 
 import Dao.InventarioDaoImpl;
+import Dao.PagosDaoImpl;
 import Dao.PedidoDaoImpl;
 import Dao.ProductoDaoImpl;
 import Interface.IInventario;
+import Interface.IPagos;
 import Interface.IPedido;
 import Interface.IProducto;
 import Model.DetallePedido;
 import Model.Direccion;
+import Model.EstadoPago;
+import Model.EstadoPedido;
 import Model.Inventario;
+import Model.Pagos;
 import Model.Pedidos;
 import Model.Persona;
 import Model.Producto;
@@ -41,11 +46,19 @@ public class AppController extends HttpServlet {
     private final IProducto pDao = new ProductoDaoImpl();
     private final IInventario iDao = new InventarioDaoImpl();
     private final IPedido peDao = new PedidoDaoImpl();
+    private final IPagos pagoDao = new PagosDaoImpl();
     private final Gson gson = new Gson();
+
+    private static class ItemEdicion {
+
+        int id_det_pedido;
+        int id_inventario;
+        int cantidad;
+    }
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
+        
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
@@ -213,7 +226,7 @@ public class AppController extends HttpServlet {
                     }
                     out.print(jr.toString());
                     break;
-                    
+
                 case "listarMisCompras":
                     Usuario userCompras = (Usuario) session.getAttribute("usuario");
                     if (userCompras == null || userCompras.getPersona() == null) {
@@ -224,7 +237,30 @@ public class AppController extends HttpServlet {
                             userCompras.getPersona().getId_persona());
                     out.print(gson.toJson(misPedidos));
                     break;
-
+                // listar TODOS los pedidos 
+                case "listarTodosPedidos":
+                    try {
+                        List<Pedidos> todosPedidos = peDao.listarTodos();
+                        out.print(gson.toJson(todosPedidos));
+                    } catch (Exception ex) {
+                        out.print("[]");
+                    }
+                    break;
+                // cambiar estado de un pedido 
+                case "cambiarEstadoPedido":
+                    try {
+                        int idPedCambio = Integer.parseInt(request.getParameter("id_pedido"));
+                        String nuevoEstado = request.getParameter("nuevo_estado");
+                        boolean okEstado = peDao.cambiarEstado(idPedCambio, nuevoEstado);
+                        jr.addProperty("success", okEstado);
+                        jr.addProperty("message", okEstado ? "Estado actualizado" : "Error al actualizar");
+                        out.print(jr.toString());
+                    } catch (Exception ex) {
+                        jr.addProperty("success", false);
+                        jr.addProperty("message", "Error: " + ex.getMessage());
+                        out.print(jr.toString());
+                    }
+                    break;
                 case "detallePedido":
                     try {
                         int idPed = Integer.parseInt(request.getParameter("id_pedido"));
@@ -327,6 +363,24 @@ public class AppController extends HttpServlet {
                     int resultado = peDao.generarPedido(pedido);
 
                     if (resultado > 0) {
+                        // Registrar el pago en la tabla PAGOS
+                        String metodoPagoParam = request.getParameter("metodo_pago");
+                        if (metodoPagoParam == null || metodoPagoParam.trim().isEmpty()) {
+                            metodoPagoParam = "NO_ESPECIFICADO";
+                        }
+                        Pagos pago = new Pagos();
+                        Pedidos pedidoRef = new Pedidos();
+                        pedidoRef.setId_pedido(resultado);
+                        pedidoRef.setTotal(totalPagar);
+                        pago.setPedidos(pedidoRef);
+                        pago.setMetodo_pago(metodoPagoParam);
+                        pago.setFecha(new Timestamp(System.currentTimeMillis()));
+                        pago.setEstadopago(EstadoPago.PAGADO);
+                        pago.setImagen(null);
+                        int pagoRegistrado = pagoDao.registrarPago(pago);
+                        System.out.println("PAGO: " + (pagoRegistrado > 0 ? "OK" : "FALLO") + " | ID_PEDIDO=" + resultado);
+
+                        // Descontar stock
                         for (DetallePedido det : carrito) {
                             Inventario invAct = iDao.buscarPorId(
                                     det.getInventario().getId_inventario());
@@ -346,6 +400,7 @@ public class AppController extends HttpServlet {
                         jr.addProperty("success", true);
                         jr.addProperty("message", "¡Compra exitosa!");
                         jr.addProperty("total", totalPagar);
+                        jr.addProperty("id_pedido", resultado);
 
                     } else {
                         jr.addProperty("success", false);
@@ -354,6 +409,270 @@ public class AppController extends HttpServlet {
                                 + "Intente nuevamente.");
                     }
                     out.print(jr.toString());
+                    break;
+                case "editarPedido":
+                    try {
+                        Usuario userEdit = (Usuario) session.getAttribute("usuario");
+                        if (userEdit == null || userEdit.getPersona() == null) {
+                            jr.addProperty("success", false);
+                            jr.addProperty("message", "Debe iniciar sesión para continuar");
+                            out.print(jr.toString());
+                            return;
+                        }
+
+                        int idPedidoEdit = Integer.parseInt(request.getParameter("id_pedido"));
+                        String itemsJson = request.getParameter("items");
+
+                        Pedidos pedidoEdit = peDao.buscarPorId(idPedidoEdit);
+                        if (pedidoEdit == null) {
+                            jr.addProperty("success", false);
+                            jr.addProperty("message", "Pedido no encontrado");
+                            out.print(jr.toString());
+                            return;
+                        }
+
+                        // Validar que el pedido pertenezca al cliente en sesión
+                        if (pedidoEdit.getPersona() == null
+                                || pedidoEdit.getPersona().getId_persona()
+                                != userEdit.getPersona().getId_persona()) {
+                            jr.addProperty("success", false);
+                            jr.addProperty("message", "No tiene permisos sobre este pedido");
+                            out.print(jr.toString());
+                            return;
+                        }
+
+                        // A1 - Pedido en tránsito o más allá: no se puede editar
+                        EstadoPedido estadoActualEdit = pedidoEdit.getEstado();
+                        if (estadoActualEdit == EstadoPedido.ENVIADO) {
+                            jr.addProperty("success", false);
+                            jr.addProperty("message",
+                                    "Su pedido ya está en camino, para cambios contacte a soporte.");
+                            out.print(jr.toString());
+                            return;
+                        }
+                        if (estadoActualEdit == EstadoPedido.ENTREGADO
+                                || estadoActualEdit == EstadoPedido.CANCELADO) {
+                            jr.addProperty("success", false);
+                            jr.addProperty("message", "Este pedido no se puede modificar.");
+                            out.print(jr.toString());
+                            return;
+                        }
+
+                        if (itemsJson == null || itemsJson.trim().isEmpty()) {
+                            jr.addProperty("success", false);
+                            jr.addProperty("message", "No se recibieron cambios para aplicar.");
+                            out.print(jr.toString());
+                            return;
+                        }
+
+                        ItemEdicion[] itemsEdit = gson.fromJson(itemsJson, ItemEdicion[].class);
+                        if (itemsEdit == null || itemsEdit.length == 0) {
+                            jr.addProperty("success", false);
+                            jr.addProperty("message",
+                                    "El pedido debe tener al menos un producto. "
+                                    + "Si deseas cancelar todo, usa la opción Cancelar.");
+                            out.print(jr.toString());
+                            return;
+                        }
+
+                        // Validar stock para todos los cambios ANTES de aplicar nada
+                        for (ItemEdicion itEdit : itemsEdit) {
+                            DetallePedido original = null;
+                            for (DetallePedido d : pedidoEdit.getDetallepedido()) {
+                                if (d.getId_det_pedido() == itEdit.id_det_pedido) {
+                                    original = d;
+                                    break;
+                                }
+                            }
+                            if (original == null) {
+                                jr.addProperty("success", false);
+                                jr.addProperty("message", "Ítem de pedido no encontrado.");
+                                out.print(jr.toString());
+                                return;
+                            }
+                            if (itEdit.cantidad > 0) {
+                                Inventario invDestino = iDao.buscarPorId(itEdit.id_inventario);
+                                if (invDestino == null) {
+                                    jr.addProperty("success", false);
+                                    jr.addProperty("message", "Variante de producto no encontrada.");
+                                    out.print(jr.toString());
+                                    return;
+                                }
+                                boolean mismaVariante
+                                        = invDestino.getId_inventario()
+                                        == original.getInventario().getId_inventario();
+                                int cantidadRequerida = mismaVariante
+                                        ? (itEdit.cantidad - original.getCantidad())
+                                        : itEdit.cantidad;
+                                if (cantidadRequerida > 0
+                                        && invDestino.getStock() < cantidadRequerida) {
+                                    jr.addProperty("success", false);
+                                    jr.addProperty("message",
+                                            "Stock insuficiente para "
+                                            + original.getProducto().getNombre()
+                                            + " (Talla: " + invDestino.getTalla()
+                                            + ", Color: " + invDestino.getColor()
+                                            + "). Disponible: " + invDestino.getStock());
+                                    out.print(jr.toString());
+                                    return;
+                                }
+                            }
+                        }
+
+                        // Aplicar los cambios: ajustar stock y actualizar/eliminar detalle
+                        double nuevoTotalEdit = 0.0;
+                        for (ItemEdicion itEdit : itemsEdit) {
+                            DetallePedido original = null;
+                            for (DetallePedido d : pedidoEdit.getDetallepedido()) {
+                                if (d.getId_det_pedido() == itEdit.id_det_pedido) {
+                                    original = d;
+                                    break;
+                                }
+                            }
+                            int idInvOriginal = original.getInventario().getId_inventario();
+
+                            if (itEdit.cantidad <= 0) {
+                                // Quitar producto del pedido: liberar todo su stock reservado
+                                Inventario invOriginal = iDao.buscarPorId(idInvOriginal);
+                                if (invOriginal != null) {
+                                    iDao.actualizarStock(idInvOriginal,
+                                            invOriginal.getStock() + original.getCantidad());
+                                }
+                                peDao.eliminarItemDetalle(original.getId_det_pedido());
+                                continue;
+                            }
+
+                            boolean mismaVariante = itEdit.id_inventario == idInvOriginal;
+
+                            if (mismaVariante) {
+                                int delta = itEdit.cantidad - original.getCantidad();
+                                if (delta != 0) {
+                                    Inventario invDestino = iDao.buscarPorId(itEdit.id_inventario);
+                                    iDao.actualizarStock(itEdit.id_inventario,
+                                            invDestino.getStock() - delta);
+                                }
+                            } else {
+                                // Cambio de talla/color: liberar la variante anterior
+                                Inventario invOriginal = iDao.buscarPorId(idInvOriginal);
+                                if (invOriginal != null) {
+                                    iDao.actualizarStock(idInvOriginal,
+                                            invOriginal.getStock() + original.getCantidad());
+                                }
+                                Inventario invDestino = iDao.buscarPorId(itEdit.id_inventario);
+                                iDao.actualizarStock(itEdit.id_inventario,
+                                        invDestino.getStock() - itEdit.cantidad);
+                            }
+
+                            double nuevoSubtotal = itEdit.cantidad * original.getPrecio_unitario();
+                            peDao.actualizarItemDetalle(original.getId_det_pedido(),
+                                    itEdit.id_inventario, itEdit.cantidad, nuevoSubtotal);
+                            nuevoTotalEdit += nuevoSubtotal;
+                        }
+
+                        peDao.actualizarTotal(idPedidoEdit, nuevoTotalEdit);
+
+                        jr.addProperty("success", true);
+                        jr.addProperty("message",
+                                "Pedido actualizado correctamente. Se notificó la actualización.");
+                        jr.addProperty("total", nuevoTotalEdit);
+                        out.print(jr.toString());
+
+                    } catch (Exception ex) {
+                        jr.addProperty("success", false);
+                        jr.addProperty("message", "Error al editar el pedido: " + ex.getMessage());
+                        out.print(jr.toString());
+                    }
+                    break;
+
+                case "cancelarPedido":
+                    try {
+                        Usuario userCancel = (Usuario) session.getAttribute("usuario");
+                        if (userCancel == null || userCancel.getPersona() == null) {
+                            jr.addProperty("success", false);
+                            jr.addProperty("message", "Debe iniciar sesión para continuar");
+                            out.print(jr.toString());
+                            return;
+                        }
+
+                        int idPedidoCancel = Integer.parseInt(request.getParameter("id_pedido"));
+                        String motivoCancel = request.getParameter("motivo");
+
+                        if (motivoCancel == null || motivoCancel.trim().isEmpty()) {
+                            jr.addProperty("success", false);
+                            jr.addProperty("message", "Debe indicar un motivo breve de la cancelación.");
+                            out.print(jr.toString());
+                            return;
+                        }
+
+                        Pedidos pedidoCancel = peDao.buscarPorId(idPedidoCancel);
+                        if (pedidoCancel == null) {
+                            jr.addProperty("success", false);
+                            jr.addProperty("message", "Pedido no encontrado");
+                            out.print(jr.toString());
+                            return;
+                        }
+
+                        if (pedidoCancel.getPersona() == null
+                                || pedidoCancel.getPersona().getId_persona()
+                                != userCancel.getPersona().getId_persona()) {
+                            jr.addProperty("success", false);
+                            jr.addProperty("message", "No tiene permisos sobre este pedido");
+                            out.print(jr.toString());
+                            return;
+                        }
+
+                        EstadoPedido estadoActualCancel = pedidoCancel.getEstado();
+                        if (estadoActualCancel == EstadoPedido.ENVIADO) {
+                            jr.addProperty("success", false);
+                            jr.addProperty("message",
+                                    "Su pedido ya está en camino, para cambios contacte a soporte.");
+                            out.print(jr.toString());
+                            return;
+                        }
+                        if (estadoActualCancel == EstadoPedido.ENTREGADO
+                                || estadoActualCancel == EstadoPedido.CANCELADO) {
+                            jr.addProperty("success", false);
+                            jr.addProperty("message", "Este pedido no se puede cancelar.");
+                            out.print(jr.toString());
+                            return;
+                        }
+
+                        // Liberar stock de todas las prendas del pedido
+                        if (pedidoCancel.getDetallepedido() != null) {
+                            for (DetallePedido det : pedidoCancel.getDetallepedido()) {
+                                Inventario invLib = iDao.buscarPorId(
+                                        det.getInventario().getId_inventario());
+                                if (invLib != null) {
+                                    iDao.actualizarStock(det.getInventario().getId_inventario(),
+                                            invLib.getStock() + det.getCantidad());
+                                }
+                            }
+                        }
+
+                        peDao.cancelarPedido(idPedidoCancel, motivoCancel.trim());
+
+                        // Si hubo pago digital previo, generar ticket de aviso para devolución
+                        boolean generoTicket = false;
+                        List<Pagos> pagosPedido = pagoDao.listarPorPedido(idPedidoCancel);
+                        for (Pagos pg : pagosPedido) {
+                            if (pg.getEstadopago() == EstadoPago.PAGADO) {
+                                pagoDao.actualizarEstado(pg.getId_pago(),
+                                        EstadoPago.REEMBOLSO_PENDIENTE.name());
+                                generoTicket = true;
+                            }
+                        }
+
+                        jr.addProperty("success", true);
+                        jr.addProperty("message", generoTicket
+                                ? "Pedido cancelado correctamente. Se generó un ticket para la gestión de tu reembolso."
+                                : "Pedido cancelado correctamente. Se notificó la cancelación.");
+                        out.print(jr.toString());
+
+                    } catch (Exception ex) {
+                        jr.addProperty("success", false);
+                        jr.addProperty("message", "Error al cancelar el pedido: " + ex.getMessage());
+                        out.print(jr.toString());
+                    }
                     break;
 
                 default:
@@ -370,6 +689,7 @@ public class AppController extends HttpServlet {
                     "Error interno: " + e.getMessage());
             response.getWriter().print(error.toString());
         }
+
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

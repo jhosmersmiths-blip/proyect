@@ -12,7 +12,13 @@ import java.util.List;
  * @author JHOSMER
  */
 public interface IPedido {
-      public int generarPedido(Pedidos pedidos);
-      public List<Pedidos> listarPorPersona(int idPersona);
-      public Pedidos buscarPorId(int idPedido);
+    public int generarPedido(Pedidos pedidos);
+    public List<Pedidos> listarPorPersona(int idPersona);
+    public Pedidos buscarPorId(int idPedido);
+    public List<Pedidos> listarTodos();
+    public boolean cambiarEstado(int idPedido, String nuevoEstado);
+    public boolean actualizarItemDetalle(int idDetPedido, int idInventario, int cantidad, double subtotal);
+    public boolean eliminarItemDetalle(int idDetPedido);
+    public boolean actualizarTotal(int idPedido, double total);
+    public boolean cancelarPedido(int idPedido, String motivo);
 }

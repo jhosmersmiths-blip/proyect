@@ -12,7 +12,7 @@
     <main class="container mt-5 mb-5">
         <div class="d-flex align-items-center gap-3 mb-4">
             <div>
-                <small class="text-danger fw-bold text-uppercase" style="letter-spacing:1px">--- Historial</small>
+                <small class="text-danger fw-bold text-uppercase mis-compras-label" >Historial</small>
                 <h2 class="display-6 fw-bold text-dark mb-0">Mis Compras</h2>
             </div>
         </div>
@@ -27,10 +27,10 @@
 
         <!-- Estado vacío -->
         <div id="empty-pedidos" class="text-center py-5 d-none">
-            <div style="font-size:60px">🛍️</div>
+            <div class="mis-compras-empty-icon"><i class="bi bi-bag-heart" class="mis-compras-precio"></i>️</div>
             <h5 class="mt-3 text-muted">Aún no tienes compras</h5>
             <p class="text-muted small">Explora el catálogo y encuentra lo que más te gusta.</p>
-            <a href="catalago.html" class="btn btn-danger mt-2">Ver catálogo</a>
+            <a href="admin_productos.html" class="btn btn-danger mt-2">Ver catálogo</a>
         </div>
     </main>
 
@@ -49,6 +49,34 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Editar Pedido  -->
+    <div class="modal fade" id="modalEditarPedido" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title"><i class="bi bi-pencil-square me-2"></i>Editar Pedido <span id="editar-id-pedido"></span></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="editar-detalle-body">
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-danger" role="status"></div>
+                    </div>
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <div class="fw-bold">
+                        Nuevo total: <span class="text-danger fs-5" id="editar-nuevo-total">S/ 0.00</span>
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="button" class="btn btn-danger" onclick="guardarEdicionPedido()">
+                            <i class="bi bi-check-lg me-1"></i>Guardar cambios
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

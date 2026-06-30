@@ -9,9 +9,9 @@
     <div id="head-placeholder"></div>
     <header id="header-placeholder"></header>
 
-    <main class="container mt-5 mb-5" style="max-width:760px">
+    <main class="container mt-5 mb-5 perfil-container">
         <div class="mb-4">
-            <small class="text-danger fw-bold text-uppercase" style="letter-spacing:1px">--- Cuenta</small>
+            <small class="text-danger fw-bold text-uppercase perfil-section-label" >--- Cuenta</small>
             <h2 class="display-6 fw-bold text-dark mb-0">Mi Perfil</h2>
         </div>
 
@@ -19,7 +19,7 @@
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-body d-flex align-items-center gap-4 py-4">
                 <div class="perfil-avatar bg-danger text-white rounded-circle d-flex align-items-center justify-content-center fw-bold"
-                     style="width:80px;height:80px;font-size:32px" id="avatar-iniciales">?</div>
+                     class="perfil-avatar d-flex align-items-center justify-content-center rounded-circle bg-danger text-white fw-bold" id="avatar-iniciales">?</div>
                 <div>
                     <h4 class="mb-0 fw-bold" id="perfil-nombre-completo">Cargando...</h4>
                     <p class="text-muted mb-0 small" id="perfil-correo-header"></p>
@@ -51,19 +51,19 @@
                     <div class="row g-3">
                         <div class="col-md-4">
                             <label class="form-label small fw-bold text-muted">Nombre</label>
-                            <div class="form-control bg-light border-0 text-dark" id="info-nombre" style="cursor:default">—</div>
+                            <div class="form-control bg-light border-0 text-dark" id="info-nombre" class="perfil-campo-readonly">—</div>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small fw-bold text-muted">Apellido Paterno</label>
-                            <div class="form-control bg-light border-0 text-dark" id="info-apell-paterno" style="cursor:default">—</div>
+                            <div class="form-control bg-light border-0 text-dark" id="info-apell-paterno" class="perfil-campo-readonly">—</div>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small fw-bold text-muted">Apellido Materno</label>
-                            <div class="form-control bg-light border-0 text-dark" id="info-apell-materno" style="cursor:default">—</div>
+                            <div class="form-control bg-light border-0 text-dark" id="info-apell-materno" class="perfil-campo-readonly">—</div>
                         </div>
                         <div class="col-12">
                             <label class="form-label small fw-bold text-muted">Correo electrónico</label>
-                            <div class="form-control bg-light border-0 text-dark" id="info-correo" style="cursor:default">—</div>
+                            <div class="form-control bg-light border-0 text-dark" id="info-correo" class="perfil-campo-readonly">—</div>
                         </div>
                     </div>
                     <p class="text-muted small mt-3 mb-0"><i class="bi bi-lock me-1"></i>Estos datos no pueden modificarse. Contacta al administrador si necesitas actualizarlos.</p>

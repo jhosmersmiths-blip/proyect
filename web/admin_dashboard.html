@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <div id="head-placeholder"></div>
+</head>
+<body>
+<header id="header-placeholder"></header>
+
+<main class="container-fluid mt-4 mb-5">
+    <div class="container">
+
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+            <div>
+                <small class="text-danger fw-bold text-uppercase">--- Panel Admin</small>
+                <h2 class="fw-bold text-dark mb-0">Dashboard</h2>
+            </div>
+        </div>
+
+        <!-- KPIs -->
+        <div class="row g-3 mb-5">
+            <div class="col-6 col-md-2">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <div class="rounded-circle bg-danger bg-opacity-10 d-flex align-items-center justify-content-center admin-kpi-icon">
+                            <i class="bi bi-box-seam text-danger fs-5"></i>
+                        </div>
+                        <div>
+                            <div class="fs-4 fw-bold" id="kpi-productos">—</div>
+                            <div class="text-muted small">Productos</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <div class="rounded-circle bg-info bg-opacity-10 d-flex align-items-center justify-content-center admin-kpi-icon">
+                            <i class="bi bi-bag-check text-info fs-5"></i>
+                        </div>
+                        <div>
+                            <div class="fs-4 fw-bold" id="kpi-pedidos">—</div>
+                            <div class="text-muted small">Pedidos</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <div class="rounded-circle bg-warning bg-opacity-10 d-flex align-items-center justify-content-center admin-kpi-icon">
+                            <i class="bi bi-clock text-warning fs-5"></i>
+                        </div>
+                        <div>
+                            <div class="fs-4 fw-bold text-warning" id="kpi-pendientes">—</div>
+                            <div class="text-muted small">Pendientes</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4">
+                <div class="card border-0 shadow-sm h-100" class="admin-kpi-ganancias">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <div class="rounded-circle bg-success bg-opacity-10 d-flex align-items-center justify-content-center admin-kpi-icon">
+                            <i class="bi bi-trophy text-success fs-5"></i>
+                        </div>
+                        <div>
+                            <div class="fs-4 fw-bold text-success" id="kpi-ganancias">—</div>
+                            <div class="text-muted small">Ganancias <span class="badge bg-success-subtle text-success" class="admin-badge-small">ENTREGADOS</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center admin-kpi-icon">
+                            <i class="bi bi-cash-stack text-primary fs-5"></i>
+                        </div>
+                        <div>
+                            <div class="fs-5 fw-bold text-primary" id="kpi-ingresos">—</div>
+                            <div class="text-muted small">Facturado</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Últimos pedidos -->
+            <div class="col-lg-7">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center pt-3 pb-0 px-4">
+                        <h6 class="fw-bold mb-0"><i class="bi bi-bag-check me-2 text-info"></i>Últimos Pedidos</h6>
+                       
+                    </div>
+                    <div class="card-body p-0 pt-2">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead>
+                                    <tr class="border-0">
+                                        <th class="ps-4 text-muted small fw-normal border-0">#</th>
+                                        <th class="text-muted small fw-normal border-0">Cliente</th>
+                                        <th class="text-muted small fw-normal border-0 text-end">Total</th>
+                                        <th class="text-muted small fw-normal border-0 text-center">Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-ultimos-pedidos">
+                                    <tr><td colspan="4" class="text-center py-4">
+                                        <div class="spinner-border spinner-border-sm text-danger"></div>
+                                    </td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel derecho -->
+            <div class="col-lg-5 d-flex flex-column gap-4">
+                <!-- Barras de estado -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-0 pt-3 pb-0 px-4">
+                        <h6 class="fw-bold mb-0"><i class="bi bi-pie-chart me-2 text-danger"></i>Estado de Pedidos</h6>
+                    </div>
+                    <div class="card-body" id="estado-pedidos-bars">
+                        <div class="text-center py-3">
+                            <div class="spinner-border spinner-border-sm text-danger"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stock bajo -->
+                <div class="card border-0 shadow-sm flex-grow-1">
+                    <div class="card-header bg-white border-0 pt-3 pb-0 px-4">
+                        <h6 class="fw-bold mb-0"><i class="bi bi-exclamation-triangle me-2 text-warning"></i>Stock Bajo</h6>
+                    </div>
+                    <div class="card-body p-0 pt-2" id="lista-stock-bajo">
+                        <div class="text-center py-3">
+                            <div class="spinner-border spinner-border-sm text-danger"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer id="footer-placeholder"></footer>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

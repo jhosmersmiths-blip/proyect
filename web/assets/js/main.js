@@ -48,8 +48,7 @@ async function init(){
                 actualizarContadorCarrito();
             if (typeof cargarCarrito === 'function')
                 cargarCarrito();
-            if (typeof cargarTablaAdmin === 'function')
-                cargarTablaAdmin();
+
 
             // Mis Compras
             if (typeof cargarMisCompras === 'function' && document.getElementById('lista-pedidos')) {
@@ -111,7 +110,15 @@ async function init(){
                 }
             }
 
-        },200);
+
+            // Admin Dashboard
+            if (typeof initDashboard === 'function') initDashboard();
+            // Admin Productos
+            if (typeof initAdminProductos === 'function') initAdminProductos();
+            // Admin Pedidos
+            if (typeof initAdminPedidos === 'function') initAdminPedidos();
+
+        },500);
         
     } catch (e) {
         console.error("Error al cargar la aplicacion",e); 

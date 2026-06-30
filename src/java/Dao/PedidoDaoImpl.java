@@ -92,7 +92,7 @@ public class PedidoDaoImpl implements IPedido {
                 }
             }
         }
-        return r;
+        return id_pedido;
     }
 
     @Override
@@ -100,7 +100,6 @@ public class PedidoDaoImpl implements IPedido {
         List<Pedidos> lista = new java.util.ArrayList<>();
         try {
             cn = ConexionSingleton.getConnection();
-            // Traer pedidos de la persona
             String q = "SELECT p.ID_PEDIDO, p.FECHA, p.ESTADO, p.TOTAL, "
                     + "d.ID_DIRECCION, d.CIUDAD, d.CALLE "
                     + "FROM PEDIDOS p "
@@ -141,11 +140,11 @@ public class PedidoDaoImpl implements IPedido {
     public Pedidos buscarPorId(int idPedido) {
         try {
             cn = ConexionSingleton.getConnection();
-            String q = "SELECT p.ID_PEDIDO, p.FECHA, p.ESTADO, p.TOTAL, "
-                     + "d.ID_DIRECCION, d.CIUDAD, d.CALLE "
-                     + "FROM PEDIDOS p "
-                     + "LEFT JOIN DIRECCION d ON p.ID_DIRECCION = d.ID_DIRECCION "
-                     + "WHERE p.ID_PEDIDO = ?";
+            String q = "SELECT p.ID_PEDIDO, p.FECHA, p.ESTADO, p.TOTAL, p.ID_PERSONA, "
+                    + "d.ID_DIRECCION, d.CIUDAD, d.CALLE "
+                    + "FROM PEDIDOS p "
+                    + "LEFT JOIN DIRECCION d ON p.ID_DIRECCION = d.ID_DIRECCION "
+                    + "WHERE p.ID_PEDIDO = ?";
             PreparedStatement st = cn.prepareStatement(q);
             st.setInt(1, idPedido);
             ResultSet rs = st.executeQuery();
@@ -155,9 +154,17 @@ public class PedidoDaoImpl implements IPedido {
                 ped.setFecha(rs.getTimestamp("FECHA"));
                 String estadoStr = rs.getString("ESTADO");
                 if (estadoStr != null) {
-                    try { ped.setEstado(EstadoPedido.valueOf(estadoStr)); } catch (Exception ex) {}
+                    try {
+                        ped.setEstado(EstadoPedido.valueOf(estadoStr));
+                    } catch (Exception ex) {
+                    }
                 }
                 ped.setTotal(rs.getDouble("TOTAL"));
+
+                Model.Persona dueno = new Model.Persona();
+                dueno.setId_persona(rs.getInt("ID_PERSONA"));
+                ped.setPersona(dueno);
+
                 Model.Direccion dir = new Model.Direccion();
                 dir.setId_direccion(rs.getInt("ID_DIRECCION"));
                 dir.setCiudad(rs.getString("CIUDAD"));
@@ -169,10 +176,11 @@ public class PedidoDaoImpl implements IPedido {
         } catch (Exception e) {
             System.out.println("Error buscarPorId: " + e.getMessage());
         }
-        return null;    }
+        return null;
+    }
 
-    private java.util.List<DetallePedido> cargarDetalles(int idPedido) {
-        java.util.List<DetallePedido> detalles = new java.util.ArrayList<>();
+    private List<DetallePedido> cargarDetalles(int idPedido) {
+        List<DetallePedido> detalles = new java.util.ArrayList<>();
         try {
             String q = "SELECT dp.ID_DET_PEDIDO, dp.CANTIDAD, dp.PRECIO_UNITARIO, dp.SUBTOTAL, "
                     + "pr.ID_PRODUCTO, pr.NOMBRE AS NOM_PROD, "
@@ -205,5 +213,132 @@ public class PedidoDaoImpl implements IPedido {
             System.out.println("Error cargarDetalles: " + e.getMessage());
         }
         return detalles;
+    }
+
+    @Override
+    public List<Pedidos> listarTodos() {
+        List<Pedidos> lista = new java.util.ArrayList<>();
+        try {
+            cn = ConexionSingleton.getConnection();
+            String q = "SELECT p.ID_PEDIDO, p.FECHA, p.ESTADO, p.TOTAL, "
+                    + "d.ID_DIRECCION, d.CIUDAD, d.CALLE, "
+                    + "pe.ID_PERSONA, pe.NOMBRE, pe.APELL_PATERNO, pe.APELL_MATERNO, pe.CORREO, pe.TELEFONO "
+                    + "FROM PEDIDOS p "
+                    + "LEFT JOIN DIRECCION d  ON p.ID_DIRECCION = d.ID_DIRECCION "
+                    + "LEFT JOIN PERSONA  pe  ON p.ID_PERSONA   = pe.ID_PERSONA "
+                    + "ORDER BY p.FECHA DESC";
+            PreparedStatement st = cn.prepareStatement(q);
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                Pedidos ped = new Pedidos();
+                ped.setId_pedido(rs.getInt("ID_PEDIDO"));
+                ped.setFecha(rs.getTimestamp("FECHA"));
+                ped.setTotal(rs.getDouble("TOTAL"));
+                String estadoStr = rs.getString("ESTADO");
+                if (estadoStr != null) {
+                    try {
+                        ped.setEstado(EstadoPedido.valueOf(estadoStr));
+                    } catch (Exception ex) {
+                    }
+                }
+                // Dirección
+                Model.Direccion dir = new Model.Direccion();
+                dir.setId_direccion(rs.getInt("ID_DIRECCION"));
+                dir.setCiudad(rs.getString("CIUDAD"));
+                dir.setCalle(rs.getString("CALLE"));
+                ped.setDireccion(dir);
+                // Persona (cliente)
+                Model.Persona per = new Model.Persona();
+                per.setId_persona(rs.getInt("ID_PERSONA"));
+                per.setNombre(rs.getString("NOMBRE"));
+                per.setApell_paterno(rs.getString("APELL_PATERNO"));
+                per.setApell_materno(rs.getString("APELL_MATERNO"));
+                per.setCorreo(rs.getString("CORREO"));
+                per.setTelefono(rs.getString("TELEFONO"));
+                ped.setPersona(per);
+                lista.add(ped);
+            }
+        } catch (Exception e) {
+            System.out.println("Error listarTodos: " + e.getMessage());
+        }
+        return lista;
+    }
+
+    @Override
+    public boolean cambiarEstado(int idPedido, String nuevoEstado) {
+        try {
+            cn = ConexionSingleton.getConnection();
+            String q = "UPDATE PEDIDOS SET ESTADO = ? WHERE ID_PEDIDO = ?";
+            PreparedStatement st = cn.prepareStatement(q);
+            st.setString(1, nuevoEstado);
+            st.setInt(2, idPedido);
+            return st.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.out.println("Error cambiarEstado: " + e.getMessage());
+            return false;
+        }
+    }
+
+    @Override
+    public boolean actualizarItemDetalle(int idDetPedido, int idInventario, int cantidad, double subtotal) {
+        try {
+            cn = ConexionSingleton.getConnection();
+            String q = "UPDATE DETALLE_PEDIDO SET ID_INVENTARIO = ?, CANTIDAD = ?, SUBTOTAL = ? "
+                    + "WHERE ID_DET_PEDIDO = ?";
+            PreparedStatement st = cn.prepareStatement(q);
+            st.setInt(1, idInventario);
+            st.setInt(2, cantidad);
+            st.setDouble(3, subtotal);
+            st.setInt(4, idDetPedido);
+            return st.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.out.println("Error actualizarItemDetalle: " + e.getMessage());
+            return false;
+        }
+    }
+
+    @Override
+    public boolean eliminarItemDetalle(int idDetPedido) {
+        try {
+            cn = ConexionSingleton.getConnection();
+            String q = "DELETE FROM DETALLE_PEDIDO WHERE ID_DET_PEDIDO = ?";
+            PreparedStatement st = cn.prepareStatement(q);
+            st.setInt(1, idDetPedido);
+            return st.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.out.println("Error eliminarItemDetalle: " + e.getMessage());
+            return false;
+        }
+    }
+
+    @Override
+    public boolean actualizarTotal(int idPedido, double total) {
+        try {
+            cn = ConexionSingleton.getConnection();
+            String q = "UPDATE PEDIDOS SET TOTAL = ? WHERE ID_PEDIDO = ?";
+            PreparedStatement st = cn.prepareStatement(q);
+            st.setDouble(1, total);
+            st.setInt(2, idPedido);
+            return st.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.out.println("Error actualizarTotal: " + e.getMessage());
+            return false;
+        }
+    }
+
+    @Override
+    public boolean cancelarPedido(int idPedido, String motivo) {
+        try {
+            cn = ConexionSingleton.getConnection();
+            String q = "UPDATE PEDIDOS SET ESTADO = ?, MOTIVO_CANCELACION = ? WHERE ID_PEDIDO = ?";
+            PreparedStatement st = cn.prepareStatement(q);
+            st.setString(1, EstadoPedido.CANCELADO.name());
+            st.setString(2, motivo);
+            st.setInt(3, idPedido);
+            return st.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.out.println("Error cancelarPedido: " + e.getMessage());
+            return false;
+        }
     }
 }

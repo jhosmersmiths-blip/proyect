@@ -104,51 +104,72 @@ public class ProductoController extends HttpServlet {
                                 java.nio.file.StandardCopyOption.REPLACE_EXISTING);
                     }
                     System.out.println("Guardado en Source OK");
-                    
+
                     part.write(pathBuild + fileName);
                     System.out.println("Guardado en build OK");
 
                 } catch (Exception e) {
-                    System.err.println("Error critico"+e.getMessage());
+                    System.err.println("Error critico" + e.getMessage());
                     e.printStackTrace();
                 }
-                p.setImagen("assets/img/producto/"+fileName);
+                p.setImagen("assets/img/producto/" + fileName);
 
             }
             boolean res = pDao.insertar(p);
             response.getWriter().print(gson.toJson(res));
 
         } catch (Exception e) {
-             response.getWriter().print(gson.toJson(false));
+            response.getWriter().print(gson.toJson(false));
         }
     }
 
     private void editarProductos(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         try {
+
             Producto p = new Producto();
+            p.setId_producto( Integer.parseInt(request.getParameter("id_producto"))
+            );
+
+            Categoria cat = new Categoria();
+            cat.setId_categoria( Integer.parseInt(request.getParameter("id_categoria"))
+            );
+            p.setCategoria(cat);
+
             p.setNombre(request.getParameter("nombre"));
             p.setDescripcion(request.getParameter("descripcion"));
-            p.setPrecio(Double.parseDouble(request.getParameter("precio")));
-            p.setId_producto(Integer.parseInt(request.getParameter("id_producto")));
+            p.setPrecio( Double.parseDouble(request.getParameter("precio"))
+            );
 
             Part part = request.getPart("imagen");
 
             if (part != null && part.getSize() > 0) {
+
                 String fileName = part.getSubmittedFileName();
+
                 String uploadPath = getServletContext().getRealPath("")
                         + File.separator + UPLOAD_DIR;
 
                 part.write(uploadPath + File.separator + fileName);
+
                 p.setImagen(UPLOAD_DIR + "/" + fileName);
+
             } else {
-                p.setImagen(request.getParameter("imagen actual"));
+
+                p.setImagen(request.getParameter("imagen_actual"));
+
             }
+
             boolean res = pDao.actualizar(p);
+
             response.getWriter().print(gson.toJson(res));
 
         } catch (Exception e) {
+
+            e.printStackTrace();
+
             response.getWriter().print(gson.toJson(false));
+
         }
 
     }

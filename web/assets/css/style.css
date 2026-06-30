@@ -8,16 +8,16 @@
     color:#fff !important;
 }
 .btn-outline-success{
-    border-color: #f8a900 !important;
+    border-color: #c9536a !important;
     color:#fff !important;
 }
 .btn-outline-success:hover{
-     background-color: #f8a900 !important;
-    color: #003366 !important;
+    background-color: #DA8999 !important;
+    color: #DA8999 !important;
 }
-.card-header{
-    background-color: #003366 !important;
-    color: #fff !important; 
+.navbar-brand{
+    background-color: #c9536a !important;
+    color: #fff !important;
 
 }
 .catalog-header small{
@@ -40,10 +40,280 @@
     width: 220px;
 }
 .text-danger {
-    color: #dd94a2 !important;
+    color: #C9536A !important;
 }
 .carousel-inner{
-    height: 400px;        /* ajusta este valor */
-    object-fit: cover;    /* recorta sin deformar */
-    object-position: top; /* muestra la parte superior */
+    height: 700px;
+    object-fit: cover;
+    object-position: top;
+}
+
+.carrito-thead              {
+    background-color: #c9536a;
+    color: white;
+}
+.perfil-container           {
+    max-width: 760px;
+}
+.perfil-section-label       {
+    letter-spacing: 1px;
+}
+.perfil-avatar              {
+    width: 80px;
+    height: 80px;
+    font-size: 32px;
+}
+.perfil-campo-readonly      {
+    cursor: default;
+}
+.mis-compras-label          {
+    letter-spacing: 1px;
+}
+.mis-compras-empty-icon     {
+    font-size: 60px;
+}
+.mis-compras-precio         {
+    color: #c9536a;
+}
+
+.admin-kpi-icon             {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+}
+.admin-kpi-ganancias        {
+    border-left: 4px solid #198754 !important;
+}
+.admin-badge-small          {
+    font-size: 0.65rem;
+}
+.admin-filtro-text          {
+    max-width: 260px;
+}
+.admin-filtro-select        {
+    max-width: 200px;
+}
+.admin-filtro-select-sm     {
+    max-width: 180px;
+}
+.admin-modal-estado         {
+    max-width: 380px;
+}
+.tabla-prod-img             {
+    width: 55px;
+    height: 55px;
+    object-fit: cover;
+}
+.tabla-prod-desc            {
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.tabla-ped-dir              {
+    max-width: 180px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.prod-card-img              {
+    height: 200px;
+    object-fit: cover;
+}
+.pago-titulo-color          {
+    color: #c9536a;
+}
+.detalle-pago-oculto        {
+    display: none;
+}
+.pago-card-row              {
+    display: flex;
+    gap: 8px;
+    margin: 4px 0;
+}
+.pago-card-input-half       {
+    flex: 1;
+}
+.yape-qr-img                {
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
+    border-radius: 12px;
+    border: 2px solid #6B21A8;
+}
+.yape-color                 {
+    color: #6B21A8;
+}
+.progreso-barra             {
+    height: 8px;
+    border-radius: 4px;
+}
+.progreso-fill              {
+    width: 0%;
+    transition: width .3s;
+    border-radius: 4px;
+}
+.carrito-select-inline      {
+    min-width: 160px;
+}
+.carrito-qty-input          {
+    width: 80px;
+    display: inline-block;
+}
+
+.dash-stock-icon            {
+    width: 36px;
+    height: 36px;
+    object-fit: cover;
+}
+.dash-fecha-sm              {
+    font-size: 0.75rem;
+}
+.dash-badge-sm              {
+    font-size: 0.7rem;
+}
+.dash-barra                 {
+    height: 8px;
+    border-radius: 4px;
+}
+
+.modal-prod-content         {
+    border-radius: 16px;
+    overflow: hidden;
+    border: 0;
+    box-shadow: 0 20px 60px rgba(0,0,0,.15);
+}
+.modal-prod-header          {
+    background: linear-gradient(135deg, #c9536a 0%, #a0374e 100%);
+}
+.modal-prod-footer          {
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+}
+.prod-campo-label           {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6b7280;
+}
+.prod-campo-input           {
+    border: 1.5px solid #e5e7eb;
+    border-radius: 8px;
+}
+.prod-campo-input:focus     {
+    border-color: #c9536a;
+    box-shadow: 0 0 0 3px rgba(201,83,106,.12);
+    outline: none;
+}
+.prod-precio-prefix         {
+    border-radius: 8px 0 0 8px;
+    border: 1.5px solid #e5e7eb;
+    border-right: 0;
+    background: #f9fafb;
+    color: #6b7280;
+    font-weight: 600;
+}
+.prod-precio-input          {
+    border-radius: 0 8px 8px 0;
+    border: 1.5px solid #e5e7eb;
+    border-left: 0;
+}
+.prod-precio-input:focus    {
+    border-color: #c9536a;
+    box-shadow: 0 0 0 3px rgba(201,83,106,.12);
+    outline: none;
+}
+.prod-upload-area           {
+    border: 2px dashed #e5e7eb;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+    display: block;
+}
+.prod-upload-area:hover     {
+    border-color: #c9536a;
+    background: #fff5f6;
+}
+.prod-preview-img           {
+    max-height: 130px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 2px solid #f3f4f6;
+}
+.variantes-zona             {
+    background: #fafafa;
+    border: 1.5px dashed #e5e7eb;
+    border-radius: 12px;
+    padding: 18px 20px;
+}
+.variantes-titulo           {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: #c9536a;
+}
+.var-chip                   {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #fff0f3;
+    border: 1px solid #f8c4cc;
+    border-radius: 20px;
+    padding: 4px 12px 4px 10px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #a0374e;
+}
+.var-chip-btn               {
+    background: none;
+    border: none;
+    padding: 0;
+    line-height: 1;
+    color: #c9536a;
+    cursor: pointer;
+    font-size: 1rem;
+}
+.var-chip-btn:hover         {
+    color: #7f0020;
+}
+.prod-btn                   {
+    border-radius: 8px;
+}
+.btn-outline-primary {
+    color: #c9536a;
+    border-color: #c9536a;
+}
+.btn-outline-info {
+    color: #c9536a;
+    border-color: #c9536a;
+}
+.btn-outline-info:hover {
+    color: #c9536a;
+    background-color:#fff;
+    border-color: #c9536a;
+}
+.dropdown-item {
+    display: block;
+    width: 100%;
+    padding: .25rem 1rem;
+    clear: both;
+    font-weight: 400;
+    color: #c9536a;
+    text-align: inherit;
+    text-decoration: none;
+    white-space: nowrap;
+    background-color: transparent;
+    border: 0;
+}
+
+.dropdown-item:hover,.dropdown-item:focus,
+.dropdown-item.active,.dropdown-item:active {
+    color: #c9536a !important;
+    background-color: #fff0f3 !important;
+    font-weight: 600;
 }
