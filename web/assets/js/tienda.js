@@ -46,12 +46,11 @@ function cargarProductos() {
                      data-id-categoria="${idCat}">
                     <div class="card h-100 shadow-sm border-0">
                         <img src="${imagen}" alt="${p.nombre}"
-                             class="card-img-top p-2"
-                             class="prod-card-img"
+                             class="card-img-top prod-card-img p-2"
                              onerror="this.src='https://via.placeholder.com/200x200?text=Sin+imagen'">
                         <div class="card-body d-flex flex-column">
-                            <h6 class="card-title fw-bold">${p.nombre}</h6>
-                            <p class="card-text text-muted small flex-grow-1">${p.descripcion || ''}</p>
+                            <h6 class="card-title fw-bold prod-card-title">${p.nombre}</h6>
+                            <p class="card-text text-muted small flex-grow-1 prod-card-desc">${p.descripcion || ''}</p>
                             <div class="d-flex justify-content-between align-items-center mt-2">
                                 <span class="fs-5 fw-bold text-danger">S/ ${p.precio.toFixed(2)}</span>   
                             </div>

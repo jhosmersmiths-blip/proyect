@@ -118,8 +118,22 @@
 }
 
 .prod-card-img              {
-    height: 200px;
-    object-fit: cover;
+    height: 220px;
+    width: 100%;
+    object-fit: contain;
+    background-color: #f8f9fa;
+}
+.prod-card-title            {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.prod-card-desc             {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .pago-titulo-color          {
     color: #c9536a;

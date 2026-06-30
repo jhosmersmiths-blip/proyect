@@ -29,10 +29,10 @@ public class ProductoDaoImpl implements IProducto {
         String query = null;
 
         try {
-            query = "SELECT p.ID_PRODUCTO, p.NOMBRE, p.DESCRIPCION, p.PRECIO, p.IMAGEN, "
-                  + "p.ID_CATEGORIA, c.NOMBRE AS NOM_CAT "
-                  + "FROM PRODUCTO p "
-                  + "LEFT JOIN CATEGORIA c ON p.ID_CATEGORIA = c.ID_CATEGORIA";
+            query = "SELECT p.ID_PRODUCTO, p.NOMBRE AS NOM_PROD, p.DESCRIPCION, p.PRECIO, p.IMAGEN, "
+                    + "p.ID_CATEGORIA, c.NOMBRE AS NOM_CAT "
+                    + "FROM PRODUCTO p "
+                    + "LEFT JOIN CATEGORIA c ON p.ID_CATEGORIA = c.ID_CATEGORIA";
             lista = new ArrayList<>();
             cn = ConexionSingleton.getConnection();
             st = cn.prepareStatement(query);
@@ -44,10 +44,10 @@ public class ProductoDaoImpl implements IProducto {
 
                 Categoria cat = new Categoria();
                 cat.setId_categoria(rs.getInt("ID_CATEGORIA"));
-                cat.setNombre(rs.getString("NOMBRE"));
+                cat.setNombre(rs.getString("NOM_CAT"));
                 pr.setCategoria(cat);
 
-                pr.setNombre(rs.getString("NOMBRE"));
+                pr.setNombre(rs.getString("NOM_PROD"));
                 pr.setDescripcion(rs.getString("DESCRIPCION"));
                 pr.setPrecio(rs.getDouble("PRECIO"));
                 pr.setImagen(rs.getString("IMAGEN"));
@@ -141,7 +141,6 @@ public class ProductoDaoImpl implements IProducto {
         } finally {
             if (cn != null) {
                 try {
-                    cn.close();
                 } catch (Exception e) {
                     System.out.println("Error al cerrar la conexion: " + e.getMessage());
                 }
@@ -174,7 +173,7 @@ public class ProductoDaoImpl implements IProducto {
                 prod.setDescripcion(rs.getString("DESCRIPCION"));
                 prod.setPrecio(rs.getDouble("PRECIO"));
                 prod.setImagen(rs.getString("IMAGEN"));
-                
+
             }
 
         } catch (Exception e) {

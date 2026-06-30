@@ -118,7 +118,7 @@ async function init(){
             // Admin Pedidos
             if (typeof initAdminPedidos === 'function') initAdminPedidos();
 
-        },500);
+        },200);
         
     } catch (e) {
         console.error("Error al cargar la aplicacion",e); 
